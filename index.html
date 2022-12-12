@@ -71,6 +71,81 @@
       <div class="outer">
         <section id="main">
   
+    <article id="post-强符号和弱符号/index" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
+  <div class="article-meta">
+    <a href="/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/" class="article-date">
+  <time class="dt-published" datetime="2022-12-12T16:46:55.000Z" itemprop="datePublished">2022-12-13</time>
+</a>
+    
+  </div>
+  <div class="article-inner">
+    
+    
+      <header class="article-header">
+        
+  
+    <h1 itemprop="name">
+      <a class="p-name article-title" href="/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/">强符号和弱符号</a>
+    </h1>
+  
+
+      </header>
+    
+    <div class="e-content article-entry" itemprop="articleBody">
+      
+        <h1 id="强符号弱符号、COMMON符号"><a href="#强符号弱符号、COMMON符号" class="headerlink" title="强符号弱符号、COMMON符号"></a>强符号弱符号、COMMON符号</h1><p>有这样一种情况，存在两个文件：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// COMMON</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// COMMON</span></span><br></pre></td></tr></table></figure>
+
+<p>如果对上面的两个文件使用<code>gcc -o acfun a.c b.c</code>，并不会有什么问题可以正确编译。</p>
+<p>但是如果两个<code>a</code>都被赋值：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// .bss</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// .bss</span></span><br></pre></td></tr></table></figure>
+
+<p>那么就会出现如下报错：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/ld: /tmp/ccVoXotY.o:(.bss+0x0): multiple definition of `a&#x27;; /tmp/cczukyyr.o:(.bss+0x0): first defined here</span><br><span class="line">collect2: error: ld returned 1 exit status</span><br></pre></td></tr></table></figure>
+
+<p>原因是两个在<code>.bss</code>段中的符号冲突了。</p>
+<p>实际上在不定义的情况下，两个<code>a</code>在各自的.o文件中是放在COMMON段的，例如使用<code>gcc -c a.c</code>、<code>readelf -s a.o</code>来进行查看：</p>
+<p><img src="/image-20221204172052443.png" alt="image-20221204172052443"></p>
+<p>不过事实上elf中并不存在一个COMMON段，这是一个特殊的段，如果使用<code>readelf -S a.o</code>的话什么都看不到：</p>
+<p><img src="/image-20221204172243435.png" alt="image-20221204172243435"></p>
+<p>而且，这个段只会在链接中出现，在可执行文件中并不会出现，按照第一种情况，也就是都不初始化为0的情况来进行编译，用readelf查看最终编译出来的acfun文件的符号表，会发现：</p>
+<p><img src="/image-20221204172544330.png" alt="image-20221204172544330"></p>
+<p><img src="/image-20221204172500183.png" alt="image-20221204172500183"></p>
+<p><code>a</code>现在存在于.bss段中。</p>
+<p>C&#x2F;C++中为初始化的全局变量定义都会出现在COMMON段中，不过看到的一种说法[3]，并不一定？以前一些老的编译器不会那么做，不过应该不太重要了。另外，弱符号和强符号都是对于符号的定义来说的，如果用了extern就只是声明，也就是他们的st_shndx都不为SHN_UNDEF，用了extern就是SHN_UNDEF。</p>
+<p>如果符号在COMMON段中，那么其就是一个弱符号或弱定义（或者叫做可以合并的符号？因为还有个STB_WEAK容易搞混），同样的，如果符号表中的binding属性的STB_WEAK也是一个弱符号。这种弱符号有那么一个特点，可以定义在多个.o文件下，在优先级相同的情况下，如果谁占得空间比较大，那么就选择那个定义作为符号的定义，如果优先级不同，选择优先级高的。</p>
+<p>比如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a;</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">long</span> a;</span><br></pre></td></tr></table></figure>
+
+<p>都是COMMON符号，链接器会让它们最终会在.bss段分配8Byte的空间给符号<code>a</code>，因为下面那个long的定义被选择了。如果存在优先级高的优先选择优先级高的定义，比如：</p>
+<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">long</span> a;</span><br></pre></td></tr></table></figure>
+
+<p>最终在.bss段分配了4Byte给符号<code>a</code>，如果a.c中初始化为非0的，那么会分配在.data段中。</p>
+<p><code>__attribute__((weak))</code>会使得一个符号是弱符号，即使它初始化了，而且比COMMON还要弱，所以优先级从高到低依次为STB_GLOBAL、COMMON、STB_WEAK，我不清楚C里面还有什么情况下会导致一个符号是weak的。</p>
+<p>三者之间覆盖的规则和上面一样的，谁优先级高就取谁为最终大小，即使它在大小上小于优先级低的，同时如果有初始化的话，那么符号的值也是被选取的定义的值。如果优先级相同，那么按照大的来选取，如果有值按照同样的处理，当然不能有重复的STB_GLOBAL要不然冲突了。如果被选择的定义是有初始化的，那么，最终在.data段，否则是.bss段。如果所有的定义都是STB_WEAK，那么最终的binding也是STB_WEAK，否则是STB_GLOBAL。</p>
+<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>[1] <a target="_blank" rel="noopener" href="https://maskray.me/blog/2022-02-06-all-about-common-symbols">All about COMMON symbols | MaskRay</a></p>
+<p>[2] <a target="_blank" rel="noopener" href="https://maskray.me/blog/2021-04-25-weak-symbol">Weak symbol | MaskRay</a></p>
+<p>[3] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/16835716/bss-vs-common-what-goes-where">c - .bss vs COMMON: what goes where? - Stack Overflow</a></p>
+
+      
+    </div>
+    <footer class="article-footer">
+      <a data-url="http://example.com/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/" data-id="clbl1bfft0002qbho53oq8fhv" data-title="强符号和弱符号" class="article-share-link">Share</a>
+      
+      
+      
+    </footer>
+  </div>
+  
+</article>
+
+
+
+  
     <article id="post-cil" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
   <div class="article-meta">
     <a href="/2022/12/13/cil/" class="article-date">
@@ -97,7 +172,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/12/13/cil/" data-id="clbl18sf60001eoho79e11iqi" data-title="cili" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/12/13/cil/" data-id="clbl1bffn0000qbhoculy37ng" data-title="cili" class="article-share-link">Share</a>
       
       
       
@@ -148,7 +223,7 @@
       
     </div>
     <footer class="article-footer">
-      <a data-url="http://example.com/2022/12/13/hello-world/" data-id="clbl18sf80002eohoagxq3qfh" data-title="Hello World" class="article-share-link">Share</a>
+      <a data-url="http://example.com/2022/12/13/hello-world/" data-id="clbl1bffr0001qbho0m9673w1" data-title="Hello World" class="article-share-link">Share</a>
       
       
       
@@ -189,6 +264,10 @@
     <h3 class="widget-title">Recent Posts</h3>
     <div class="widget">
       <ul>
+        
+          <li>
+            <a href="/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/">强符号和弱符号</a>
+          </li>
         
           <li>
             <a href="/2022/12/13/cil/">cili</a>
