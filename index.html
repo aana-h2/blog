@@ -1,328 +1,184 @@
-<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8">
-  
-  
-  <title>Hexo</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
-  <meta property="og:type" content="website">
-<meta property="og:title" content="Hexo">
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>A-Book Project</title><meta name="author" content="aana_h2"><meta name="copyright" content="aana_h2"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta property="og:type" content="website">
+<meta property="og:title" content="A-Book Project">
 <meta property="og:url" content="http://example.com/index.html">
-<meta property="og:site_name" content="Hexo">
-<meta property="og:locale" content="en_US">
-<meta property="article:author" content="John Doe">
+<meta property="og:site_name" content="A-Book Project">
+<meta property="og:locale" content="zh_CN">
+<meta property="og:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png">
+<meta property="article:author" content="aana_h2">
 <meta name="twitter:card" content="summary">
+<meta name="twitter:image" content="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="http://example.com/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'A-Book Project',
+  isPost: false,
+  isHome: true,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2022-12-14 00:19:38'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
   
-    <link rel="alternate" href="/atom.xml" title="Hexo" type="application/atom+xml">
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
   
-  
-    <link rel="shortcut icon" href="/favicon.png">
-  
-  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
     
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/typeface-source-code-pro@0.0.71/index.min.css">
-
-  
-  
-<link rel="stylesheet" href="/css/style.css">
-
-  
-    
-<link rel="stylesheet" href="/fancybox/jquery.fancybox.min.css">
-
-  
-<meta name="generator" content="Hexo 6.3.0"></head>
-
-<body>
-  <div id="container">
-    <div id="wrap">
-      <header id="header">
-  <div id="banner"></div>
-  <div id="header-outer" class="outer">
-    <div id="header-title" class="inner">
-      <h1 id="logo-wrap">
-        <a href="/" id="logo">Hexo</a>
-      </h1>
-      
-    </div>
-    <div id="header-inner" class="inner">
-      <nav id="main-nav">
-        <a id="main-nav-toggle" class="nav-icon"></a>
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
         
-          <a class="main-nav-link" href="/">Home</a>
-        
-          <a class="main-nav-link" href="/archives">Archives</a>
-        
-      </nav>
-      <nav id="sub-nav">
-        
-          <a id="nav-rss-link" class="nav-icon" href="/atom.xml" title="RSS Feed"></a>
-        
-        <a id="nav-search-btn" class="nav-icon" title="Search"></a>
-      </nav>
-      <div id="search-form-wrap">
-        <form action="//google.com/search" method="get" accept-charset="UTF-8" class="search-form"><input type="search" name="q" class="search-form-input" placeholder="Search"><button type="submit" class="search-form-submit">&#xF002;</button><input type="hidden" name="sitesearch" value="http://example.com"></form>
-      </div>
-    </div>
-  </div>
-</header>
-
-      <div class="outer">
-        <section id="main">
-  
-    <article id="post-强符号和弱符号/index" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/" class="article-date">
-  <time class="dt-published" datetime="2022-12-12T16:46:55.000Z" itemprop="datePublished">2022-12-13</time>
-</a>
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
     
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/">强符号和弱符号</a>
-    </h1>
-  
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">2</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">3</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">0</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 所有</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div></div></div><div class="page" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Book Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-archive"></i><span> 所有</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/categories/"><i class="fa-fw fas fa-folder-open"></i><span> 分类</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-heart"></i><span> About</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div class="recent-posts" id="recent-posts"><div class="recent-post-item"><div class="post_cover left"><a href="/2022/12/14/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%BC%B1%E7%AC%A6%E5%8F%B7%E3%80%81COMMON%E7%AC%A6%E5%8F%B7/" title="强符号弱符号、COMMON符号"><img class="post_bg" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="强符号弱符号、COMMON符号"></a></div><div class="recent-post-info"><a class="article-title" href="/2022/12/14/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%BC%B1%E7%AC%A6%E5%8F%B7%E3%80%81COMMON%E7%AC%A6%E5%8F%B7/" title="强符号弱符号、COMMON符号">强符号弱符号、COMMON符号</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2022-12-13T16:16:31.000Z" title="发表于 2022-12-14 00:16:31">2022-12-14</time></span></div><div class="content">有这样一种情况，存在两个文件：
+12345// a.cint a; // COMMONint main() &#123;	return 0;&#125;
 
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <h1 id="强符号弱符号、COMMON符号"><a href="#强符号弱符号、COMMON符号" class="headerlink" title="强符号弱符号、COMMON符号"></a>强符号弱符号、COMMON符号</h1><p>有这样一种情况，存在两个文件：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// COMMON</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+12// b.cint a; // COMMON
 
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// COMMON</span></span><br></pre></td></tr></table></figure>
+如果对上面的两个文件使用gcc -o acfun a.c b.c，并不会有什么问题可以正确编译。
+但是如果两个a都被赋值：
+12345// a.cint a; // .bssint main() &#123;	return 0;&#125;
 
-<p>如果对上面的两个文件使用<code>gcc -o acfun a.c b.c</code>，并不会有什么问题可以正确编译。</p>
-<p>但是如果两个<code>a</code>都被赋值：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// .bss</span></span><br><span class="line"><span class="type">int</span> <span class="title function_">main</span><span class="params">()</span> &#123;</span><br><span class="line">	<span class="keyword">return</span> <span class="number">0</span>;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>
+12// b.cint a; // .bss
 
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">int</span> a; <span class="comment">// .bss</span></span><br></pre></td></tr></table></figure>
+那么就会出现如下报错：
+12/usr/bin/ld: /tmp/ccVoXotY.o:(.bss+0x0): multiple definition of `a&#x27;; /tmp/cczukyyr.o:(.bss+0x0): first defined herecollect2: error: ld returned 1 exit status
 
-<p>那么就会出现如下报错：</p>
-<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line">/usr/bin/ld: /tmp/ccVoXotY.o:(.bss+0x0): multiple definition of `a&#x27;; /tmp/cczukyyr.o:(.bss+0x0): first defined here</span><br><span class="line">collect2: error: ld returned 1 exit status</span><br></pre></td></tr></table></figure>
+原因是两个在.bss段中的符号冲突了。
+实际上在不定义的情况下，两个a在各自的.o文件中是放在COMMON段的，例如使用gcc -c a.c、r ...</div></div></div><div class="recent-post-item"><div class="post_cover left"><a href="/2022/12/13/%E4%BD%9C%E7%94%A8%E5%9F%9F%E5%92%8C%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92/" title="CMake的作用域和参数传递"><img class="post_bg" src="https://images.pexels.com/photos/1624863/pexels-photo-1624863.jpeg" onerror="this.onerror=null;this.src='/img/404.jpg'" alt="CMake的作用域和参数传递"></a></div><div class="recent-post-info"><a class="article-title" href="/2022/12/13/%E4%BD%9C%E7%94%A8%E5%9F%9F%E5%92%8C%E5%8F%82%E6%95%B0%E4%BC%A0%E9%80%92/" title="CMake的作用域和参数传递">CMake的作用域和参数传递</a><div class="article-meta-wrap"><span class="post-meta-date"><i class="far fa-calendar-alt"></i><span class="article-meta-label">发表于</span><time datetime="2022-12-13T15:52:46.000Z" title="发表于 2022-12-13 23:52:46">2022-12-13</time></span></div><div class="content">作为学习cmake的基础，作用域和参数传递挺重要的，因为感觉在阅读LLVM的cmake使用的时候会大量使用函数，而cmake本身也非常像是编程语言一样。
+作用域和大多数的编程语言所使用的词法作用域不同，cmake是基于动态作用域的，因此可以有类似这样的操作：
+123456function(hello)	message($&#123;msg&#125;)endfunction()set(msg &quot;hello,world&quot;)hello()
 
-<p>原因是两个在<code>.bss</code>段中的符号冲突了。</p>
-<p>实际上在不定义的情况下，两个<code>a</code>在各自的.o文件中是放在COMMON段的，例如使用<code>gcc -c a.c</code>、<code>readelf -s a.o</code>来进行查看：</p>
-<p><img src="/image-20221204172052443.png" alt="image-20221204172052443"></p>
-<p>不过事实上elf中并不存在一个COMMON段，这是一个特殊的段，如果使用<code>readelf -S a.o</code>的话什么都看不到：</p>
-<p><img src="/image-20221204172243435.png" alt="image-20221204172243435"></p>
-<p>而且，这个段只会在链接中出现，在可执行文件中并不会出现，按照第一种情况，也就是都不初始化为0的情况来进行编译，用readelf查看最终编译出来的acfun文件的符号表，会发现：</p>
-<p><img src="/image-20221204172544330.png" alt="image-20221204172544330"></p>
-<p><img src="/image-20221204172500183.png" alt="image-20221204172500183"></p>
-<p><code>a</code>现在存在于.bss段中。</p>
-<p>C&#x2F;C++中为初始化的全局变量定义都会出现在COMMON段中，不过看到的一种说法[3]，并不一定？以前一些老的编译器不会那么做，不过应该不太重要了。另外，弱符号和强符号都是对于符号的定义来说的，如果用了extern就只是声明，也就是他们的st_shndx都不为SHN_UNDEF，用了extern就是SHN_UNDEF。</p>
-<p>如果符号在COMMON段中，那么其就是一个弱符号或弱定义（或者叫做可以合并的符号？因为还有个STB_WEAK容易搞混），同样的，如果符号表中的binding属性的STB_WEAK也是一个弱符号。这种弱符号有那么一个特点，可以定义在多个.o文件下，在优先级相同的情况下，如果谁占得空间比较大，那么就选择那个定义作为符号的定义，如果优先级不同，选择优先级高的。</p>
-<p>比如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a;</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">long</span> a;</span><br></pre></td></tr></table></figure>
+也就是说一个函数执行的上下文和调用发生的上下文有紧密关系，其实它复制了一份外层的环境[1]，所以在内层对变量进行set是无法对外层产生影响的，可以认为这里的“环境”是一个map&lt;string,string&gt;，内层是使用了拷贝构造进行构造的，而不是传了个引用。
+另外需要知道一点就是实际上cmake里面的一切都是文本，即使看起来像一个变量，比如上面的msg，它是一个变量么？是也不是，它仍然是一个普通的字符串，如果使用了$&#123;msg&#125;，并不是对变量进行引用，而是进行了类似于map[&quot;msg&quot ...</div></div></div><nav id="pagination"><div class="pagination"><span class="page-number current">1</span></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget card-tags"><div class="item-headline"><i class="fas fa-tags"></i><span>标签</span></div><div class="card-tag-cloud"><a href="/tags/CMake/" style="font-size: 1.1em; color: #999">CMake</a> <a href="/tags/elf/" style="font-size: 1.1em; color: #999">elf</a> <a href="/tags/%E9%93%BE%E6%8E%A5%E5%99%A8/" style="font-size: 1.1em; color: #999">链接器</a></div></div><div class="card-widget card-archives"><div class="item-headline"><i class="fas fa-archive"></i><span>归档</span></div><ul class="card-archive-list"><li class="card-archive-list-item"><a class="card-archive-list-link" href="/archives/2022/12/"><span class="card-archive-list-date">十二月 2022</span><span class="card-archive-list-count">2</span></a></li></ul></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 By aana_h2</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
 
-<p>都是COMMON符号，链接器会让它们最终会在.bss段分配8Byte的空间给符号<code>a</code>，因为下面那个long的定义被选择了。如果存在优先级高的优先选择优先级高的定义，比如：</p>
-<figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">// a.c</span></span><br><span class="line"><span class="type">int</span> a = <span class="number">0</span>;</span><br><span class="line"></span><br><span class="line"><span class="comment">// b.c</span></span><br><span class="line"><span class="type">long</span> a;</span><br></pre></td></tr></table></figure>
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
 
-<p>最终在.bss段分配了4Byte给符号<code>a</code>，如果a.c中初始化为非0的，那么会分配在.data段中。</p>
-<p><code>__attribute__((weak))</code>会使得一个符号是弱符号，即使它初始化了，而且比COMMON还要弱，所以优先级从高到低依次为STB_GLOBAL、COMMON、STB_WEAK，我不清楚C里面还有什么情况下会导致一个符号是weak的。</p>
-<p>三者之间覆盖的规则和上面一样的，谁优先级高就取谁为最终大小，即使它在大小上小于优先级低的，同时如果有初始化的话，那么符号的值也是被选取的定义的值。如果优先级相同，那么按照大的来选取，如果有值按照同样的处理，当然不能有重复的STB_GLOBAL要不然冲突了。如果被选择的定义是有初始化的，那么，最终在.data段，否则是.bss段。如果所有的定义都是STB_WEAK，那么最终的binding也是STB_WEAK，否则是STB_GLOBAL。</p>
-<h2 id="参考"><a href="#参考" class="headerlink" title="参考"></a>参考</h2><p>[1] <a target="_blank" rel="noopener" href="https://maskray.me/blog/2022-02-06-all-about-common-symbols">All about COMMON symbols | MaskRay</a></p>
-<p>[2] <a target="_blank" rel="noopener" href="https://maskray.me/blog/2021-04-25-weak-symbol">Weak symbol | MaskRay</a></p>
-<p>[3] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/16835716/bss-vs-common-what-goes-where">c - .bss vs COMMON: what goes where? - Stack Overflow</a></p>
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
 
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/" data-id="clbl1bfft0002qbho53oq8fhv" data-title="强符号和弱符号" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-cil" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/12/13/cil/" class="article-date">
-  <time class="dt-published" datetime="2022-12-12T16:42:33.960Z" itemprop="datePublished">2022-12-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2022/12/13/cil/">cili</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2022/12/13/cil/" data-id="clbl1bffn0000qbhoculy37ng" data-title="cili" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-    <article id="post-hello-world" class="h-entry article article-type-post" itemprop="blogPost" itemscope itemtype="https://schema.org/BlogPosting">
-  <div class="article-meta">
-    <a href="/2022/12/13/hello-world/" class="article-date">
-  <time class="dt-published" datetime="2022-12-12T16:16:27.398Z" itemprop="datePublished">2022-12-13</time>
-</a>
-    
-  </div>
-  <div class="article-inner">
-    
-    
-      <header class="article-header">
-        
-  
-    <h1 itemprop="name">
-      <a class="p-name article-title" href="/2022/12/13/hello-world/">Hello World</a>
-    </h1>
-  
-
-      </header>
-    
-    <div class="e-content article-entry" itemprop="articleBody">
-      
-        <p>Welcome to <a target="_blank" rel="noopener" href="https://hexo.io/">Hexo</a>! This is your very first post. Check <a target="_blank" rel="noopener" href="https://hexo.io/docs/">documentation</a> for more info. If you get any problems when using Hexo, you can find the answer in <a target="_blank" rel="noopener" href="https://hexo.io/docs/troubleshooting.html">troubleshooting</a> or you can ask me on <a target="_blank" rel="noopener" href="https://github.com/hexojs/hexo/issues">GitHub</a>.</p>
-<h2 id="Quick-Start"><a href="#Quick-Start" class="headerlink" title="Quick Start"></a>Quick Start</h2><h3 id="Create-a-new-post"><a href="#Create-a-new-post" class="headerlink" title="Create a new post"></a>Create a new post</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo new <span class="string">&quot;My New Post&quot;</span></span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/writing.html">Writing</a></p>
-<h3 id="Run-server"><a href="#Run-server" class="headerlink" title="Run server"></a>Run server</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo server</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/server.html">Server</a></p>
-<h3 id="Generate-static-files"><a href="#Generate-static-files" class="headerlink" title="Generate static files"></a>Generate static files</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo generate</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/generating.html">Generating</a></p>
-<h3 id="Deploy-to-remote-sites"><a href="#Deploy-to-remote-sites" class="headerlink" title="Deploy to remote sites"></a>Deploy to remote sites</h3><figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line">$ hexo deploy</span><br></pre></td></tr></table></figure>
-
-<p>More info: <a target="_blank" rel="noopener" href="https://hexo.io/docs/one-command-deployment.html">Deployment</a></p>
-
-      
-    </div>
-    <footer class="article-footer">
-      <a data-url="http://example.com/2022/12/13/hello-world/" data-id="clbl1bffr0001qbho0m9673w1" data-title="Hello World" class="article-share-link">Share</a>
-      
-      
-      
-    </footer>
-  </div>
-  
-</article>
-
-
-
-  
-
-
-</section>
-        
-          <aside id="sidebar">
-  
-    
-
-  
-    
-
-  
-    
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Archives</h3>
-    <div class="widget">
-      <ul class="archive-list"><li class="archive-list-item"><a class="archive-list-link" href="/archives/2022/12/">December 2022</a></li></ul>
-    </div>
-  </div>
-
-
-  
-    
-  <div class="widget-wrap">
-    <h3 class="widget-title">Recent Posts</h3>
-    <div class="widget">
-      <ul>
-        
-          <li>
-            <a href="/2022/12/13/%E5%BC%BA%E7%AC%A6%E5%8F%B7%E5%92%8C%E5%BC%B1%E7%AC%A6%E5%8F%B7/index/">强符号和弱符号</a>
-          </li>
-        
-          <li>
-            <a href="/2022/12/13/cil/">cili</a>
-          </li>
-        
-          <li>
-            <a href="/2022/12/13/hello-world/">Hello World</a>
-          </li>
-        
-      </ul>
-    </div>
-  </div>
-
-  
-</aside>
-        
-      </div>
-      <footer id="footer">
-  
-  <div class="outer">
-    <div id="footer-info" class="inner">
-      
-      &copy; 2022 John Doe<br>
-      Powered by <a href="https://hexo.io/" target="_blank">Hexo</a>
-    </div>
-  </div>
-</footer>
-
-    </div>
-    <nav id="mobile-nav">
-  
-    <a href="/" class="mobile-nav-link">Home</a>
-  
-    <a href="/archives" class="mobile-nav-link">Archives</a>
-  
-</nav>
-    
-
-
-<script src="/js/jquery-3.4.1.min.js"></script>
-
-
-
-  
-<script src="/fancybox/jquery.fancybox.min.js"></script>
-
-
-
-
-<script src="/js/script.js"></script>
-
-
-
-
-
-  </div>
-</body>
-</html>
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>
