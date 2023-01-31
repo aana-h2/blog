@@ -1,0 +1,398 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>静态单赋值形式（1） | A-Book Project</title><meta name="author" content="aana_h2"><meta name="copyright" content="aana_h2"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="视频地址：Bilibili 静态单赋值形式（Static Single Assignment Form, SSA Form），是一种IR的形式，在《编译器设计（第2版）》[1]中有比较好的描述，在《Static Single Assignment Book》[4]中对应用和扩展SSA有更加多的有关内容。 虽然名字很长一串，但是实际上的意思就是说每个变量只能被赋值一次，每次赋值需要产生一个新的名字，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="静态单赋值形式（1）">
+<meta property="og:url" content="https://blog-aana-h2.vercel.app/2022/03/19/%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC%E5%BD%A2%E5%BC%8F%EF%BC%881%EF%BC%89/index.html">
+<meta property="og:site_name" content="A-Book Project">
+<meta property="og:description" content="视频地址：Bilibili 静态单赋值形式（Static Single Assignment Form, SSA Form），是一种IR的形式，在《编译器设计（第2版）》[1]中有比较好的描述，在《Static Single Assignment Book》[4]中对应用和扩展SSA有更加多的有关内容。 虽然名字很长一串，但是实际上的意思就是说每个变量只能被赋值一次，每次赋值需要产生一个新的名字，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-18T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-01-31T04:03:18.530Z">
+<meta property="article:author" content="aana_h2">
+<meta property="article:tag" content="编译">
+<meta property="article:tag" content="SSA">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog-aana-h2.vercel.app/2022/03/19/%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC%E5%BD%A2%E5%BC%8F%EF%BC%881%EF%BC%89/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '静态单赋值形式（1）',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-31 12:03:18'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Book Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">静态单赋值形式（1）</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-03-18T16:00:00.000Z" title="发表于 2022-03-19 00:00:00">2022-03-19</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-01-31T04:03:18.530Z" title="更新于 2023-01-31 12:03:18">2023-01-31</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><p>视频地址：<a target="_blank" rel="noopener" href="https://space.bilibili.com/1535266/video">Bilibili</a></p>
+<p>静态单赋值形式（Static Single Assignment Form, SSA Form），是一种IR的形式，在《<a target="_blank" rel="noopener" href="https://book.douban.com/subject/20436488/">编译器设计（第2版）</a>》[1]中有比较好的描述，在《Static Single Assignment Book》[4]中对应用和扩展SSA有更加多的有关内容。</p>
+<p>虽然名字很长一串，但是实际上的意思就是说每个变量只能被赋值一次，每次赋值需要产生一个新的名字，也就是说下面的代码<strong>Code 1</strong>为了满足这个要求并且保持原有的语义就需要修改为<strong>Code 2</strong>的样子。 <span class="math display">\[
+\begin{align*}
+&amp;a\gets1 \\
+&amp;b\gets a+5 \\
+&amp;a\gets2 \\
+&amp;c\gets a+3
+\end{align*}
+\]</span></p>
+<center>
+<b>Code 1</b>
+</center>
+<p><span class="math display">\[
+\begin{align*}
+&amp;a_1\gets1 \\
+&amp;b_1\gets a_1+5 \\
+&amp;a_2\gets2 \\
+&amp;c_1\gets a_2+3
+\end{align*}
+\]</span></p>
+<center>
+<b>Code 2</b>
+</center>
+<p>这样一来就相当于给了每个赋值一个名字，这样<span class="math inline">\(a_1、a_2、a_3\)</span>这些可以被称作<span class="math inline">\(a\)</span>的一个版本，这样一来对于<span class="math inline">\(a\)</span>的一个使用是在哪里被定值的就可以十分清楚了，可以让很多优化变得简单。</p>
+<p>那么如果是类似于<strong>Code 3(a)</strong>这样的CFG该怎么办呢？在对<span class="math inline">\(B1\)</span>、<span class="math inline">\(B2\)</span>的<span class="math inline">\(a\)</span>进行重命名之后会产生类似于<strong>Code 3(b)</strong>这样的结果。</p>
+
+
+<div style="display:flex; flex-direction:row; justify-content:space-around">
+	<div>
+		<img src="ssaMerge.svg"/>
+		<center><b>(a)</b></center>
+	</div>
+	<div>
+		<img src="ssaMerge2.svg"/>
+		<center><b>(b)</b></center>
+	</div>
+</div>
+
+<div><center><b>Code 3</b></center></div>
+
+
+<p>那么在<span class="math inline">\(B3\)</span>中的<span class="math inline">\(a\)</span>到底该引用谁是<span class="math inline">\(a_1\)</span>还是<span class="math inline">\(a_2\)</span>？这个时候可以定义一个叫做<span class="math inline">\(\phi\)</span>函数（phi function）的特殊指令，如<strong>Code 4</strong>中在<span class="math inline">\(B3\)</span>的入口处插入了一条<span class="math inline">\(\phi\)</span>函数，其中新定义了a的新的version，<span class="math inline">\(a_3\)</span>，在随后对<span class="math inline">\(a\)</span>的使用被改写为使用<span class="math inline">\(a_3\)</span>。</p>
+<p><img src="ssaMerge3.svg" /></p>
+<center>
+<b>Code 4</b>
+</center>
+<p>加入了<span class="math inline">\(\phi\)</span>函数的基本块有几个前驱，<span class="math inline">\(\phi\)</span>函数就有几个参数，每个参数对应了一个前驱，如果是从第一条边到达的基本块<span class="math inline">\(B\)</span>，那么<span class="math inline">\(\phi\)</span>函数返回第一个参数，如果是从第二条边到达了基本块<span class="math inline">\(B\)</span>，那么<span class="math inline">\(\phi\)</span>函数返回第二个参数，以此类推。</p>
+<p>当然，事实上在计算机中找不到可以对应<span class="math inline">\(\phi\)</span>函数的指令，所以需要在完成了优化之后将<span class="math inline">\(\phi\)</span>函数进行去除。这里假设所有的<span class="math inline">\(\phi\)</span>函数都是同时被执行的，所以不会产生顺序依赖问题，不过实际上可能会产生顺序依赖的问题，不过这个问题留到后面再来说明。</p>
+<p>上面的内容可以说明“静态单赋值形式”中单赋值的含义，那么静态呢？静态和动态相对，比如在下面的代码<strong>Code 5</strong>中，对a是静态单赋值的，在IR代码中对a的赋值只有一次，但是不是动态的，这是一个循环在，实际执行中a会被赋值多次。</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">Label:</span><br><span class="line">	a &lt;- 10</span><br><span class="line">	jump Label</span><br></pre></td></tr></table></figure>
+<center>
+<b>Code 5</b>
+</center>
+<h2 id="构建">构建</h2>
+<p>普通的IR转化为SSA形式的IR可以分为两步，首先在必要的位置插入<span class="math inline">\(\phi\)</span>函数，这样就会得到类似于<span class="math inline">\(x=\phi (x,x,x)\)</span>的语句，第二步是对所有的变量进行重命名，将类似于<span class="math inline">\(x=\phi (x,x,x)\)</span>的语句转为类似于<span class="math inline">\(x_4=\phi (x_1,x_2,x_3)\)</span>的语句。</p>
+<h3 id="插入phi函数">插入<span class="math inline">\(\phi\)</span>函数</h3>
+<p>那么如何确定需要在哪些基本块的开始处插入哪些<span class="math inline">\(\phi\)</span>函数？其他的视频讲到过关于图的支配性的问题，也介绍了支配边界和支配树的概念，往下看之前需要明确这些概念。</p>
+<p>如果基本块<span class="math inline">\(B\)</span>对变量<span class="math inline">\(v\)</span>进行了定义，那么在每个<span class="math inline">\(D\in DF(B)\)</span>前需要插入一个<span class="math inline">\(v=\phi (v,...)\)</span>，这么做的原因是因为D的某些前驱一定会经过<span class="math inline">\(B\)</span>，但是<span class="math inline">\(D\)</span>的另外一些前驱不一定经过<span class="math inline">\(B\)</span>，那么对于<span class="math inline">\(v\)</span>中的值就会有冲突，所以就需要一个<span class="math inline">\(\phi\)</span>函数。</p>
+<p>不过事情不完全如此，有的时候<span class="math inline">\(\phi\)</span>函数是多余的，比如说被定义的<span class="math inline">\(v\)</span>是一个局部的，并没有被其他基本块使用，这个可以通过查看基本块的<span class="math inline">\(LiveOut\)</span>进行判断。</p>
+<h3 id="重命名">重命名</h3>
+<p>在插入了<span class="math inline">\(\phi\)</span>函数后，需要进行重命名，进行重命名的时候需要对当前变量的version进行追踪，这里可以使用栈来进行，在[1]中给出了一个算法：</p>
+<p><img src="image-20220320111654519.png" /></p>
+<p>这个算法的大致过程是在支配树上做先序遍历，然后对每个基本块内的指令进行遍历，如果出现了对一个变量<span class="math inline">\(v\)</span>的定值，无论是在<span class="math inline">\(\phi\)</span>函数进行定值还是在运算进行定值，都将产生一个新的version，并将新的version推入栈中。 遍历了基本块的所有指令后如果有后继基本块且后继基本块的开始处有<span class="math inline">\(\phi\)</span>函数，那么对那些<span class="math inline">\(\phi\)</span>函数进行填充。接下来对支配树上的结点进行递归。在返回时对栈进行出栈，恢复到进入此基本块之前的状态。</p>
+<p>之所以是对支配树进行先序遍历是因为如果存在<span class="math inline">\(D=idom(B)\)</span>，那么对于<span class="math inline">\(B\)</span>中的某个类似于<code>x &lt;- v + 2</code>的指令来说其中的<span class="math inline">\(v\)</span>一定是最新的。如果在<span class="math inline">\(B\)</span>的开始处有关于<span class="math inline">\(v\)</span>的<span class="math inline">\(\phi\)</span>函数，那么<span class="math inline">\(v\)</span>的version会被更新，如果没有关于<span class="math inline">\(v\)</span>的<span class="math inline">\(\phi\)</span>函数，那么可以保证当前栈中的<span class="math inline">\(v\)</span>的version是最新的，因为<span class="math inline">\(D=idom(B)\)</span>，那么对于任意的路径<span class="math inline">\(P=D \stackrel{+}{\longrightarrow} B\)</span> 上的结点<span class="math inline">\(M\)</span>来说，不会出现任何的结点<span class="math inline">\(M\)</span>满足<span class="math inline">\(M\in dom(B)\)</span>，只会有<span class="math inline">\(B\in DF(M)\)</span>，那么也就是说要么不定值，要么必须产生一个<span class="math inline">\(\phi\)</span>函数。</p>
+<h3 id="例子">例子</h3>
+<p>例子都来自于[1]，这里差不多就照着念了。</p>
+<p><img src="image-20220320153647980.png" /></p>
+<center>
+<b>Fig 1. 进行转化前</b>
+</center>
+<p>(a)每个基本块的代码 (b)控制流图 (c)支配边界 (d)变量出现的基本块 (e)支配树</p>
+<p><img src="image-20220320153917897.png" /></p>
+<center>
+<b>Fig 2. 插入φ函数后，重命名前</b>
+</center>
+<p><img src="image-20220320154716221.png" /></p>
+<center>
+<b>Fig 3. 重命名后</b>
+</center>
+<h2 id="摧毁">摧毁</h2>
+<p>在SSA Form下进行了优化之后需要将<span class="math inline">\(\phi\)</span>函数进行去除这个过程可以叫做SAA的摧毁（destruction，叫translate out of SSA也行，或者是eliminate phi function），其实可以将SSA的destruction往后推，比如可以在进行了寄存器分配之后再进行[2] [3]，以后应该会有这方面的视频。</p>
+<p>一个<span class="math inline">\(\phi\)</span>函数的作用是根据基本块的入边返回对应的值，比如<span class="math inline">\(\phi (x_1,x_2,x_3)\)</span>，如果从第一个边进入基本块就返回<span class="math inline">\(x_1\)</span>，如果从第二个边进入基本块那么返回<span class="math inline">\(x_2\)</span>，以此类推，也就是说如果从第一个边进入了基本块那么<span class="math inline">\(x_4\gets \phi (x_1,x_2,x_3)\)</span>等价于<span class="math inline">\(x_4\gets x_1\)</span>，第二个边进入等价于<span class="math inline">\(x_4\gets x_2\)</span>，也是以此类推。</p>
+<p>那么一个直接的想法就是将这些复制语句直接放在相应的前驱就可以了，如<strong>Fig 4(b)</strong>所示，将对应的复制语句放入对应的前驱中，这里面产生了<span class="math inline">\(x_4\)</span>​被赋值多次的情况，但是这个阶段已经不需要保持SSA Form的性质了。</p>
+
+
+<div style="display:flex; flex-direction:row; justify-content:space-around">
+	<div>
+		<img src="copyBefore.svg"/>
+		<center><b>(a)去除&phi;函数前</b></center>
+	</div>
+	<div>
+		<img src="copyAfter.svg"/>
+		<center><b>(b)去除&phi;函数后</b></center>
+	</div>
+</div>
+<div><center><b>Fig 4</b></center></div>
+
+
+<p>这些自动生成的复制语句可以在寄存器分配阶段进行消除，也可以使用其他优化进行消除，具体的可以看其他视频。</p>
+<h3 id="关键边拆分">关键边拆分</h3>
+<p>在对<span class="math inline">\(\phi\)</span>函数进行消除的时候可能会遇到<strong>Fig 5</strong>中的情况，<span class="math inline">\(B\)</span>存在多个前驱基本块，而<span class="math inline">\(D\)</span>存在多个后继基本块，如果将复制指令插入到<span class="math inline">\(D\)</span>的末尾就会影响到其他无关的基本块。对于<strong>Fig 5</strong>中黄色的边可以称其为关键边（critical edge）。</p>
+<p><img src="criticalEdge.svg" /></p>
+<center>
+<b>Fig 5. 关键边</b>
+</center>
+<p>那么如何对这样的情况进行处理呢？那么就需要将<strong>Fig 5</strong>中的关键边进行拆分，具体就是在黄边中插入一个新的基本块，然后将复制语句放在新加入的基本块中，这个过程的结果如<strong>Fig 6</strong>。</p>
+<p><img src="criticalEdgeSplit.svg" /></p>
+<center>
+<b>Fig 6. 拆分后的关键边</b>
+</center>
+<p>不过不是所有对关键边的拆分都是必要的，对关键边的拆分可能会产生大量只有几条指令的基本块而且增加了跳转语句的数量，有的时候多执行一条指令并不会引起任何的问题，而有的时候则不行，下面有对原因进行说明。</p>
+<p>这之前补充一下，大多数情况下不进行关键边分割其实不会有任何问题，因为插入的复制的名字是唯一的，所以不会对其他名字的变量产生影响。</p>
+<h3 id="复制丢失问题lost-copy-problem">复制丢失问题（Lost-Copy Problem）</h3>
+<p><img src="image-20220320222952874.png" /></p>
+<center>
+<b>Fig 7</b>
+</center>
+<p>除了处理关键边的问题之外，还有其他的问题需要进行处理，比如在<strong>Fig 7</strong>中的情况，在<strong>Fig 7(b)</strong>中展现的是进行了复制折叠之后的代码，不进行复制折叠的情况类似于<strong>Fig 8</strong>。</p>
+<p>在<strong>Fig 7(d)</strong>展示了使用关键边拆分来解决问题，但是这样会增加不必要的跳转，在循环中进行这样的操作对于循环的性能来说有损害。</p>
+<p>这之类的问题就在于，按照优化前的方式来说，如果出现了<span class="math inline">\(v_2\)</span>，那么<span class="math inline">\(v_1\)</span>就不应该使用了，也就是<span class="math inline">\(v_1\)</span>应该是被杀死的了，但是这类的优化延长了<span class="math inline">\(v_1\)</span>的活跃范围，直接的插入复制代码并无法处理类似的情况，所以必须创建一个新的变量，存放<span class="math inline">\(v_1\)</span>的值，让<span class="math inline">\(v_1\)</span>的从此之后不再活跃，<strong>Fig 7(e)</strong>就使用了这种方法来解决问题。</p>
+<p>进一步观察可以发现，在去除了<span class="math inline">\(\phi\)</span>函数之后插入的copy指令在基本块末尾，而从概念上来说，这里被认为是在进入基本块之前执行的，在循环中的话实际上就是下一个循环中执行的语句被本次循环执行了。通过关键边分割保证所有的移动语句不会放在和<span class="math inline">\(\phi\)</span>函数同一个基本块中，也就保证不会有上面的问题了。</p>
+<h3 id="交换问题swap-problem">交换问题（Swap Problem）</h3>
+<p>这种问题会出现在类似于下面<strong>Fig 8</strong>中，在将<span class="math inline">\(\phi\)</span>函数去除后就出现了swap problem，原因是在进行优化的过程中假设<span class="math inline">\(\phi\)</span>​函数是同时执行的，所以即使出现了循环引用也没有关系，比如在<strong>Fig 8(a)</strong>的中间一列就出现了循环，使用一个临时变量可以打破这种循环，见<strong>Fig 8(b)</strong>。</p>
+
+
+<div style="display:flex; flex-direction:column; justify-content:space-around">
+	<div>
+		<img src="image-20220323163123332.png"/>
+		<center><b>(a)发生了swap problem的代码</b></center>
+	</div>
+    <br/>
+	<div>
+		<center><img src="swapProblem.svg"/></center>
+		<center><b>(b)插入临时变量t</b></center>
+	</div>
+</div>
+<div><center><b>Fig 8</b></center></div>
+
+
+<p>不过有时候多余的移动指令并不是必要的，只需要调整一下插入的移动指令的顺序就行了如<strong>Fig 9</strong>。</p>
+<p><img src="image-20220323165705766.png" /></p>
+<center>
+<b>Fig 9. 对产生的复制指令的重排序解决问题</b>
+</center>
+<h3 id="放在一起">放在一起</h3>
+<p>《Engineering a Compiler》中虽然虽然描述了这两个问题，但是没有给出解决的方法，特别是一个统一的方法对问题进行解决，好在作者的论文[6]中给出了解决的方法。这里来介绍一下解决方法，这个方法不会进行关键边分割，见<strong>Fig 10</strong>。</p>
+<p>算法的主循环是对支配树进行先序遍历，这一点和进行重命名的时候是一样的，因为处理上面的两个问题都需要引入临时变量，同时修改后续的引用，所以使用了和重命名的时候相似的算法，每个前驱处理后继结点的<span class="math inline">\(\phi\)</span>函数时也是类似的，如果后继存在了<span class="math inline">\(\phi\)</span>函数，那么将移动语句插入到自己的末尾。</p>
+<p><img src="image-20220323205250511.png" /></p>
+<center>
+<b>(a)</b>
+</center>
+<p><img src="image-20220323205335962.png" /></p>
+<center>
+<b>(b)</b>
+</center>
+<center>
+<b>Fig 10. 复制插入算法</b>
+</center>
+<p><strong>Fig 10(a)</strong>是主循环，而<strong>Fig 10(b)</strong>则是处理每一个基本块的具体步骤，主循环不难理解，主要来看看如何对每个基本块进行处理。<em>schedule_copies</em>的行为是两个链表驱动的，被分为3个步骤。</p>
+<p>两个链表分别是<em>worklist</em>、<em>copy_set</em>，其中<em>copy_set</em>存放了将被插入的copy指令，其中的指令还需要进行一些处理，然后放入到<em>worklist</em>中，比如在<em>copy_set</em>中，可能存在着一些循环的依赖，这个时候就需要进行处理了，到达了<strong>pass three</strong>的第二部分，也就是<span class="math inline">\(copy\_set \neq \emptyset\)</span>（标记3）的时候，如果条件成立，那么说明在<em>copy_set</em>中存在一个环形依赖，需要利用插入一个移动语句进行破圈。</p>
+<p>第一个pass是对后继中的<span class="math inline">\(\phi\)</span>函数进行遍历，注意这个后继可能是自己本身，然后将需要插入的copy语句加入到<em>copy_set</em>，同时标记<em>src</em>被使用了（标记1），如果其他的copy语句的<em>dest</em>是<em>src</em>的话，那么它们之间存在了依赖关系，如果这个依赖不是相互的，就没有问题，能够通过顺序调整解决，这一点在后面的步骤中体现。</p>
+<p><img src="image-20220324155837856.png" /></p>
+<center>
+<b>Fig 11</b>
+</center>
+<p>第二个pass是对<em>copy_set</em>进行了遍历，如果copy语句的<em>dest</em>并没有被依赖，那么就可以移入到<em>work_list</em>中。</p>
+<p><img src="image-20220324155917850.png" /></p>
+<center>
+<b>Fig 12</b>
+</center>
+<p>第三个pass对两个链表都进行了遍历，首先遍历的是<em>work_list</em>，按照先进先出顺序取出copy语句进行插入，如果此copy语句的<em>dest</em>是出口活跃的，那么，先插入移动到临时变量的copy语句。看标记2，如果此时将一个copy语句（<span class="math inline">\(dest \gets src\)</span>）从<em>copy_set</em>移动到了<em>work_list</em>，那么说明<em>src</em>已经被使用了，移动到了dest中了，那么就可以被安全的作为其他copy的<em>dest</em>进行覆盖了。问题来了，这个<em>src</em>可以被多个copy语句使用，那么以来，后面的copy语句收到的岂不是被覆盖过的值？这里就需要使用<em>map</em>了。<em>map</em>实际上是对变量（作为<em>src</em>）被移动到了那个变量（作为<em>dest</em>）进行了追踪的，例如<span class="math inline">\(map[dest]\gets t\)</span>，意思是<em>dest</em>移动到了<em>t</em>（标记4）。第三个pass的第二部分已经在上面提到过了，就是打破环形依赖。</p>
+<p><img src="image-20220324155959159.png" /></p>
+<center>
+<b>Fig 13</b>
+</center>
+<p>在最后将所有的copy语句全部插入之后，就可以安全地删除掉所有的<span class="math inline">\(\phi\)</span>函数了。观众可以对着这个算法把上面的几个例子走一遍，看看是否能够正确生成copy语句。</p>
+<h3 id="通过-phi-class-congruence进行">通过 <span class="math inline">\(\phi\)</span>-Class Congruence进行</h3>
+<p>在<em>Sreedhar et al.</em>[5]的文章中提出了<strong>phi congruence class</strong>的概念，可以利用其性质来消除<span class="math inline">\(\phi\)</span>函数，这种方式我感觉比<em>Briggs et al.</em>[6]给出的的要好。除了可以减少插入的移动语句数量，在处理<em>lost-copy</em>和<em>swap problem</em>的时候并不需要去考虑特殊情况，也就是说处理它们和处理其他的情况是一致的。不过由于篇幅的关系，暂时不对其进行介绍了，留到后续的内容中吧，后续还会有更多有关SSA Form的内容的。</p>
+<h2 id="引用">引用</h2>
+<p>[1] Engineering a Compiler, K. Cooper</p>
+<p>[2] S. Hack, D. Grund和G. Goos, 《Register Allocation for Programs in SSA-Form》, 收入 <em>Compiler Construction</em>, Berlin, Heidelberg, 2006, 页 247–262. doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1007/11688839_20">10.1007/11688839_20</a>.</p>
+<p>[3] C. Wimmer和M. Franz, 《Linear scan register allocation on SSA form》, 收入 <em>Proceedings of the 8th annual IEEE/ ACM international symposium on Code generation and optimization - CGO ’10</em>, Toronto, Ontario, Canada, 2010, 页 170. doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1772954.1772979">10.1145/1772954.1772979</a>.</p>
+<p>[4] Static Single Assignment Book</p>
+<p>[5] V. C. Sreedhar, R. D.-C. Ju, D. M. Gillies和V. Santhanam, 《Translating Out of Static Single Assignment Form》, 收入 <em>Static Analysis</em>, 卷 1694, A. Cortesi和G. Filé, 编 Berlin, Heidelberg: Springer Berlin Heidelberg, 1999, 页 194–210. doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1007/3-540-48294-6_13">10.1007/3-540-48294-6_13</a>.</p>
+<p>[6] P. Briggs, K. D. Cooper, T. J. Harvey和L. T. Simpson, 《Practical improvements to the construction and destruction of static single assignment form》, <em>Softw: Pract. Exper.</em>, 卷 28, 期 8, 页 859–881, 7月 1998, doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1002/(SICI)1097-024X(19980710)28:8%3C859::AID-SPE188%3E3.0.CO;2-8">10.1002/(SICI)1097-024X(19980710)28:8&lt;859::AID-SPE188&gt;3.0.CO;2-8</a>.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app">aana_h2</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app/2022/03/19/%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC%E5%BD%A2%E5%BC%8F%EF%BC%881%EF%BC%89/">https://blog-aana-h2.vercel.app/2022/03/19/静态单赋值形式（1）/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog-aana-h2.vercel.app" target="_blank">A-Book Project</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%BC%96%E8%AF%91/">编译</a><a class="post-meta__tags" href="/tags/SSA/">SSA</a></div><div class="post_share"></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/2022/03/23/%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC%E5%BD%A2%E5%BC%8F%EF%BC%882%EF%BC%89/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">静态单赋值形式（2）</div></div></a></div><div class="next-post pull-right"><a href="/2022/03/04/%E7%AA%A5%E5%AD%94%E4%BC%98%E5%8C%96/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">窥孔优化</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%9E%84%E5%BB%BA"><span class="toc-number">1.</span> <span class="toc-text">构建</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8F%92%E5%85%A5phi%E5%87%BD%E6%95%B0"><span class="toc-number">1.1.</span> <span class="toc-text">插入\(\phi\)函数</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%87%8D%E5%91%BD%E5%90%8D"><span class="toc-number">1.2.</span> <span class="toc-text">重命名</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BE%8B%E5%AD%90"><span class="toc-number">1.3.</span> <span class="toc-text">例子</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%91%A7%E6%AF%81"><span class="toc-number">2.</span> <span class="toc-text">摧毁</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%85%B3%E9%94%AE%E8%BE%B9%E6%8B%86%E5%88%86"><span class="toc-number">2.1.</span> <span class="toc-text">关键边拆分</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%A4%8D%E5%88%B6%E4%B8%A2%E5%A4%B1%E9%97%AE%E9%A2%98lost-copy-problem"><span class="toc-number">2.2.</span> <span class="toc-text">复制丢失问题（Lost-Copy Problem）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BA%A4%E6%8D%A2%E9%97%AE%E9%A2%98swap-problem"><span class="toc-number">2.3.</span> <span class="toc-text">交换问题（Swap Problem）</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%94%BE%E5%9C%A8%E4%B8%80%E8%B5%B7"><span class="toc-number">2.4.</span> <span class="toc-text">放在一起</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%80%9A%E8%BF%87-phi-class-congruence%E8%BF%9B%E8%A1%8C"><span class="toc-number">2.5.</span> <span class="toc-text">通过 \(\phi\)-Class Congruence进行</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">引用</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By aana_h2</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>

@@ -1,0 +1,57 @@
+Algorithm A: Algorithm for eliminating phi resource interferences based on data flow and interference graph updates.
+eliminatePhiResourceInterference()
+Inputs: instruction stream, control flow graph (CFG), LiveIn and LiveOut sets, interference graph
+Outputs: instruction stream, LiveIn and LiveOut sets, interference graph, phi congruence classes
+{
+    1: for each resource, x, participated in a phi phiCongruenceClass[x] = {x};
+    2: for each phi instruction (phiInst) in CFG {
+        phiInst in the form of x0 = f(x1:L1, x2:L2, ..., xn:Ln);
+        L0 is the basic block containing phiInst;
+        3: Set candidateResourceSet;
+        for each xi, 0 <= i <= n, in phiInst
+            unresolvedNeighborMap[xi] = {};
+        4:
+        for each pair of resources xi:Li and xj:Lj in phiInst, where 0 <= i, j <= n and xi != xj,
+            such that there exists yi in phiCongruenceClass[xi], yj in phiCongruenceClass[xj],and yi and yj interfere with each other, {
+            Determine what copies needed to break the interference between xi and xj using the four cases described in Section 4.3.
+        }
+        5: Process the unresolved resources (Case 4) as described in Section 4.3.
+        6:
+        for each xi in candidateResourceSet
+            insertCopy(xi, phiInst);
+        7:
+        // Merge phiCongruenceClass’s for all resources in phiInst.
+        currentphiCongruenceClass = {};
+        for each resource xi in phiInst, where 0 <= i <= n {
+            currentphiCongruenceClass += phiCongruenceClass[xi];
+            Let phiCongruenceClass[xi] simply point to currentphiCongruenceClass;
+        }
+    }
+    8: Nullify phi congruence classes that contain only singleton resources.
+}
+
+
+
+insertCopy(xi, phiInst)
+{
+    if( xi is a source resource of phiInst ) {
+        for every Lk associated with xi in the source list of phiInst {
+            Insert a copy inst: xnew_i = xi at the end of Lk;
+            Replace xi with xnew_i in phiInst;
+            Add xnew_i in phiCongruenceClass[xnew_i]
+            LiveOut[Lk] += xnew_i;
+            if( for Lj an immediate successor of Lk, xi not in LiveIn[Lj] and not used in a phi
+            instruction associated with Lk in Lj )
+            LiveOut[Lk] -= xi;
+            Build interference edges between xnew_i and LiveOut[Lk];
+        }
+    } else {
+        // xi is the phi target, x0.
+        Insert a copy inst: x0 = xnew_0 at the beginning of L0;
+        Replace x0 with xnew_0 as the target in phiInst;
+        Add xnew_0 in phiCongruenceClass[xnew_0]
+        LiveIn[L0] -= x0;
+        LiveIn[L0] += xnew_0;
+        Build interference edges between xnew_0 and LiveIn[L0];
+    }
+}
