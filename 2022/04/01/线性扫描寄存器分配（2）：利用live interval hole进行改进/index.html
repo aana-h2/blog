@@ -6,7 +6,7 @@
 <meta property="og:description" content="视频地址：Bilibili 下面的主要内容来自于Traub et al.的[1]，会详细的说明如何利用hole和interval split来改善寄存器分配的质量。另外，Hotspot的C1编译器也很大程度上借鉴了这个算法进行寄存器分配，只是细节上有所不同[4]，在下次的内容中会说说C1具体是怎么做的，并且给出一个对比。 利用hole和对interval进行分割 在上次的内容中，我们了解了如何使用">
 <meta property="og:locale" content="zh_CN">
 <meta property="article:published_time" content="2022-03-31T16:00:00.000Z">
-<meta property="article:modified_time" content="2023-01-31T08:10:31.000Z">
+<meta property="article:modified_time" content="2023-01-31T08:12:40.234Z">
 <meta property="article:author" content="aana_h2">
 <meta property="article:tag" content="编译">
 <meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog-aana-h2.vercel.app/2022/04/01/%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D%EF%BC%882%EF%BC%89%EF%BC%9A%E5%88%A9%E7%94%A8live%20interval%20hole%E8%BF%9B%E8%A1%8C%E6%94%B9%E8%BF%9B/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
@@ -51,7 +51,7 @@
   isHome: false,
   isHighlightShrink: false,
   isToc: true,
-  postUpdate: '2023-01-31 16:10:31'
+  postUpdate: '2023-01-31 16:12:40'
 }</script><noscript><style type="text/css">
   #nav {
     opacity: 1
@@ -140,7 +140,7 @@
       }
     }
     detectApple()
-    })(window)</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">17</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">12</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Book Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">线性扫描寄存器分配（2）：利用live interval hole进行改进</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-03-31T16:00:00.000Z" title="发表于 2022-04-01 00:00:00">2022-04-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-01-31T08:10:31.000Z" title="更新于 2023-01-31 16:10:31">2023-01-31</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><p>视频地址：<a target="_blank" rel="noopener" href="https://space.bilibili.com/1535266/video">Bilibili</a></p>
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">20</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">14</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Book Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">线性扫描寄存器分配（2）：利用live interval hole进行改进</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-03-31T16:00:00.000Z" title="发表于 2022-04-01 00:00:00">2022-04-01</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-01-31T08:12:40.234Z" title="更新于 2023-01-31 16:12:40">2023-01-31</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><p>视频地址：<a target="_blank" rel="noopener" href="https://space.bilibili.com/1535266/video">Bilibili</a></p>
 <p>下面的主要内容来自于<em>Traub et al.</em>的[1]，会详细的说明如何利用hole和interval split来改善寄存器分配的质量。另外，Hotspot的C1编译器也很大程度上借鉴了这个算法进行寄存器分配，只是细节上有所不同[4]，在下次的内容中会说说C1具体是怎么做的，并且给出一个对比。</p>
 <h2 id="利用hole和对interval进行分割">利用hole和对interval进行分割</h2>
 <p>在上次的内容中，我们了解了如何使用线性扫描来对寄存器进行分配，但是通过观察我们可以很快发现，如果我们让分配器可以利用活跃区间的下面两个特性，那么我们分配的质量就会明显提高。</p>
@@ -213,32 +213,35 @@
 <p>可以利用基本块的LiveIn信息对插入进行引导，只有当一个虚拟变量属于to块的LiveIn才需要被处理，因为如果一个虚拟变量不属于LiveIn，那么要么是使用之前存在定值，要么是不再被使用了，这两种情况下都不需要做什么处理。另外使用LiveIn信息会简化插入的逻辑，因为如果虚拟变量是LiveIn的，那么说明不会存在hole，为什么？因为如果属于to块的LiveIn的，那么不会存在一个先定值后使用，这种情况会导致入口处到定值点的hole，另外，属于to块的LiveIn就属于from块的LiveOut，根据我们之前给出的的interval的计算方法，可以知道，从from块的某一点到出口一定是存在着interval而非hole的。论文中还给出了一些优化的方案以减少所需要的存取指令，不过这里就不说了。</p>
 <h2 id="例子">例子</h2>
 <p>这里的例子是[1]中给出的，前文已经使用过了，这里只是展现一下：</p>
+
+
 <div style="display:flex; flex-direction:row; justify-content:space-around; align-items:flex-end">
-<pre><code>&lt;div&gt;
-    &lt;img src=&quot;image-20220420231106818.png&quot;/&gt;
-    &lt;center&gt;&lt;b&gt;(a) 一个CFG，黑色粗线标记的是活跃范围&lt;/b&gt;&lt;/center&gt;
-&lt;/div&gt;
-&lt;div&gt;
-    &lt;img src=&quot;image-20220420231139115.png&quot;/&gt;
-    &lt;center&gt;&lt;b&gt;(b) 根据CFG构建的活跃范围&lt;/b&gt;&lt;/center&gt;
-&lt;/div&gt;</code></pre>
+	<div>
+		<img src="image-20220420231106818.png"/>
+		<center><b>(a) 一个CFG，黑色粗线标记的是活跃范围</b></center>
+	</div>
+	<div>
+		<img src="image-20220420231139115.png"/>
+		<center><b>(b) 根据CFG构建的活跃范围</b></center>
+	</div>
 </div>
-<center>
-<b>Fig 3</b>
-</center>
+
+<center><b>Fig 3</b></center>
+
 <div style="display:flex; flex-direction:row; justify-content:space-around; align-items:flex-end">
-<pre><code>&lt;div&gt;
-    &lt;img src=&quot;image-20220420233504545.png&quot;/&gt;
-    &lt;center&gt;&lt;b&gt;(a) 一个类似的CFG，不过只关注了有关T1的指令&lt;/b&gt;&lt;/center&gt;
-&lt;/div&gt;
-&lt;div&gt;
-    &lt;img src=&quot;image-20220421002051123.png&quot;/&gt;
-    &lt;center&gt;&lt;b&gt;(b) 分配结果&lt;/b&gt;&lt;/center&gt;
-&lt;/div&gt;</code></pre>
+	<div>
+		<img src="image-20220420233504545.png"/>
+		<center><b>(a) 一个类似的CFG，不过只关注了有关T1的指令</b></center>
+	</div>
+	<div>
+		<img src="image-20220421002051123.png"/>
+		<center><b>(b) 分配结果</b></center>
+	</div>
 </div>
-<center>
-<b>Fig 4</b>
-</center>
+
+<center><b>Fig 4</b></center>
+
+
 <p>我认为<strong>Fig 4(b)</strong>的图印错了，在B4，R2应该是作为source才对。</p>
 <h2 id="结尾">结尾</h2>
 <p>在这篇文章中我们只说了原理，所以很短，因为我并没有实现<em>Traub et al.</em>的算法，我实现的是类似于C1使用的算法，所以一些实现的细节在下一篇里面。我觉得C1的算法会更加好实现一些优化。</p>
