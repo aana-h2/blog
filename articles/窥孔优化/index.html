@@ -1,0 +1,273 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>窥孔优化 | A-Book Project</title><meta name="author" content="aana_h2"><meta name="copyright" content="aana_h2"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="视频地址：Bilibili 窥孔优化（peephole optimization）的概念非常简单，在最早的论文[2]中作者只用了2页来介绍其概念以及一些可用的优化模式。我是在龙书中最早看到了这个概念的，后来又在《Crafting A Compiler》[6]中看到了这个概念。 窥孔优化大致这样操作：使用一个滑动窗口，对相邻的一个指令序列进行分析，如果当前窗口内的一个序列能够存在一个更好的等价序列，">
+<meta property="og:type" content="article">
+<meta property="og:title" content="窥孔优化">
+<meta property="og:url" content="https://blog-aana-h2.vercel.app/articles/%E7%AA%A5%E5%AD%94%E4%BC%98%E5%8C%96/index.html">
+<meta property="og:site_name" content="A-Book Project">
+<meta property="og:description" content="视频地址：Bilibili 窥孔优化（peephole optimization）的概念非常简单，在最早的论文[2]中作者只用了2页来介绍其概念以及一些可用的优化模式。我是在龙书中最早看到了这个概念的，后来又在《Crafting A Compiler》[6]中看到了这个概念。 窥孔优化大致这样操作：使用一个滑动窗口，对相邻的一个指令序列进行分析，如果当前窗口内的一个序列能够存在一个更好的等价序列，">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-03-03T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-01-31T07:51:11.059Z">
+<meta property="article:author" content="aana_h2">
+<meta property="article:tag" content="编译">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog-aana-h2.vercel.app/articles/%E7%AA%A5%E5%AD%94%E4%BC%98%E5%8C%96/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '窥孔优化',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-31 15:51:11'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/admonition.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">31</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Book Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">窥孔优化</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-03-03T16:00:00.000Z" title="发表于 2022-03-04 00:00:00">2022-03-04</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-01-31T07:51:11.059Z" title="更新于 2023-01-31 15:51:11">2023-01-31</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>视频地址：<a target="_blank" rel="noopener" href="https://space.bilibili.com/1535266/video">Bilibili</a></p>
+<p>窥孔优化（peephole optimization）的概念非常简单，在最早的论文[2]中作者只用了2页来介绍其概念以及一些可用的优化模式。我是在龙书中最早看到了这个概念的，后来又在《Crafting A Compiler》[6]中看到了这个概念。</p>
+<p>窥孔优化大致这样操作：使用一个滑动窗口，对相邻的一个指令序列进行分析，如果当前窗口内的一个序列能够存在一个更好的等价序列，那么用这个等价序列对原序列进行替换，这里的等价序列可以是一个空的序列，也就是说可以将窗口中指令删除。</p>
+<figure>
+<img src="slider.svg" alt="slider" /><figcaption>slider</figcaption>
+</figure>
+<center>
+图示
+</center>
+<p>几个基本的例子：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">// 控制流优化</span><br><span class="line">	goto L1</span><br><span class="line">L1: goto L2</span><br><span class="line">==</span><br><span class="line">	goto L2</span><br><span class="line">L1: goto L2</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br></pre></td><td class="code"><pre><span class="line">// 无用代码消除</span><br><span class="line">move a, r0</span><br><span class="line">move a, r0</span><br><span class="line">==</span><br><span class="line">move a, r0</span><br><span class="line">或者</span><br><span class="line">move a, r0</span><br><span class="line">move r0, a</span><br><span class="line">==</span><br><span class="line">move a, r0</span><br><span class="line">或者</span><br><span class="line">move r0, r0</span><br><span class="line">==</span><br><span class="line">null</span><br></pre></td></tr></table></figure>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">// 强度削减</span><br><span class="line">mul a, 2, a</span><br><span class="line">==</span><br><span class="line">shl a, 1, a</span><br></pre></td></tr></table></figure>
+<p>这里的指令序列事实上不需要是物理上相邻的，还可以是逻辑上相邻的，也就是说滑动窗口可以只在一个基本块内，也可以横跨几个基本块。分析多个基本块拓宽了分析的空间，因为有的基本块只有1-2条指令，可能比窗口小，另外可以减少间接跳转的情况，甚至消除掉无用的分支语句。</p>
+<p>除此之外，窥孔优化还可以配合数据流分析，可以达到类似于常量传播的功能，不过这些优化可能在之前的步骤就已经进行过了。数据流信息对于窥孔优化有很大的帮助，比如说：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">load 2, $r1 		// $r1 = 2</span><br><span class="line">load 3, $r2 		// $r2 = 3</span><br><span class="line">mul $r1, $r2, $r3 	// $r3 = $r1 * $r2</span><br></pre></td></tr></table></figure>
+<p>可以这样优化为<code>load 6, $r3</code>么？不行，因为无法保证<code>$r1</code>、<code>$r2</code>中的值在后续没有被使用。需要注意的是在经过寄存器分配之后，已经计算出了每个虚拟寄存器的活跃范围，只需要知道此条指令中的物理寄存器是被分配给了哪个虚拟寄存器，就可以知道当前物理寄存器中的值在此次使用之后是不是活跃的，如果不是，那么直接删除即可，也就是说甚至可以将上面3条指令全部消除掉。</p>
+<p>龙书中介绍窥孔优化是将其作为最后一步的优化来进行的，也就是生成了目标代码之后，但是窥孔优化使用的范围不止是在生成了目标代码之后，其实不是的，窥孔优化的概念可以被泛化为在指令序列里面匹配一个模式，匹配成功后用代价更加低的指令序列去替换被匹配的序列。因此，窥孔优化可以使用在最终生成的代码上也可以使用在IR上或者是AST上，不过AST一般不是序列，而是树，那么需要做的不是序列的模式匹配，而是对于树结点的模式匹配。</p>
+<p>往往，优化之后可能会产生新的优化机会，比如：</p>
+<figure>
+<img src="back-up.svg" alt="back-up" /><figcaption>back-up</figcaption>
+</figure>
+<center>
+图中标出了替换发生的范围
+</center>
+<p>这时候需要对优化窗口进行回退，否则就会错过优化的机会，或者是需要多次遍历，但是这样很慢。假设这里的窗口大小是4，那么就应该回退到发生了替换的位置的3个指令之前，比如在0和1之间由于在<code>iconst_5</code>处发生了替换，那么将窗口移动到3个指令之前，使得窗口的最后一条指令恰好是<code>iconst_5</code>，这样之前的序列就可以察觉到后面发生了变化，从而可能找出可以替换的新模式，这里将窗口移动到<code>iconst_5</code>处可能不是最优的，因为<code>iconst_5</code>没有变化，但是实现起来足够方便，每次移动的大小都是固定的。</p>
+<h2 id="算法和数据结构">算法和数据结构</h2>
+<p>使用双向链表对指令进行连接可以让指令的移除和添加效率变高，所以使用链表对代码进行组织。如果是跳转指令，那么还需要指向跳转位置，如果一个指令是一个跳转位置，那么指向引用此处的跳转指令。整体结构如下图：</p>
+<figure>
+<img src="image-20220309202911281.png" alt="image-20220309202911281" /><figcaption>image-20220309202911281</figcaption>
+</figure>
+<p>实现了用链表对代码进行组织之后，窗口可以实现为一个队列，向前移动的时候将第一个值出队就行了。</p>
+<p>而匹配模式则最好储存在hash表中，这样查找速度比较快，有个简单的方法：窗口大小是4，一个int整数是32位，如果在查找的时候分两个阶段，第一个阶段首先根据指令序列取得hash值，然后根据这个hash值获取一个函数，这个函数检查当前指令序列是否满足要求，比如是否涉及同一个变量，如果是，那么对当前指令序列进行修改。</p>
+<p>首先先匹配窗口内第一条指令，然后将范围放大到第二条，第三、第四条，找到一个最大的匹配进行替换，在对范围进行扩大时，将当前计算出的hash值进行左移8位，下面进行演示。</p>
+<p>先给下面的指令分配一个值，16进制表示，同时下面也是待会要匹配的序列：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">iconst_5  == 0x02</span><br><span class="line">iconst_4  == 0x02</span><br><span class="line">isub      == 0x64</span><br></pre></td></tr></table></figure>
+<p>这三条指令的hash为0x020264，同时给出一个匹配的规则，<code>x</code>和<code>y</code>表示任意-1到6的整数：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">iconst_x</span><br><span class="line">iconst_y</span><br><span class="line">isub</span><br><span class="line">==</span><br><span class="line">iconst_(x-y) 当-1&lt;=(x-y)&lt;=6</span><br></pre></td></tr></table></figure>
+<p>进行匹配：</p>
+<figure>
+<img src="hash.svg" alt="hash" /><figcaption>hash</figcaption>
+</figure>
+<p>每次根据这个值去查找hash表就行了，如果扩大到了4，仍旧没有进行成功的匹配，那么就将窗口向前移动1条指令，如果匹配到了多个，那么选择最长的匹配，可以先匹配长的，再匹配短的。</p>
+<h2 id="自动生成">自动生成</h2>
+<p>由于窥孔优化往往用于最终阶段，那么不可避免的和目标代码有很大的相关性，但是这样就导致了要实现多个平台的编译器就需要多次实现优化器，所以有自动生成的优化器，PO[5]就是这样一个东西，开发者对目标机器的指令进行描述，然后PO在进行扫描时分析指令序列中的指令的效果，然后寻找效果等价的替换，不过由于需要在运行中分析指令序列的含义，以及对单个的语义进行组合，组合后查找替换，然后将替换的描述再转为目标机器的指令实现。也就会拖慢运行速度，而手写的可以通过hash查表快速解决。</p>
+<p>为了解决PO速度的问题，其作者又开发了HOP[8]，能够将PO在一些典型应用上运行的结果缓存在hash表中，在运行时进行使用。</p>
+<p>除了为了解决平台相关的问题之外还有变体问题，也就是类似于：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">iload_1</span><br><span class="line">iconst_1</span><br><span class="line">imul</span><br><span class="line">等价于</span><br><span class="line">iload_1</span><br></pre></td></tr></table></figure>
+<p>这里将局部变量从局部变量表中加载出来，然后乘1，结果和直接将局部变量加载出来是一样的。但是这个模式存在多个变体，比如说，从数组中加载一个值而不是从局部变量中加载一个值呢？又比如说，乘的不是int的1，而是float类型或者double类型的1呢？或者加载的方式不是使用了<code>iconst_1</code>而是<code>bipush 1</code>呢？所以这样存在多种变体，如果只写一个泛化的模式然后能够自动进行枚举每种情况就会好得多了。在Lambright[7]的文章中描述了这样的一个问题。</p>
+<h2 id="实现">实现</h2>
+<p>由于之前发过一个图着色寄存器分配的<a target="_blank" rel="noopener" href="https://www.bilibili.com/video/BV1dr4y1z7YH">视频</a>，在里面的某个步骤中产生了一些类似于<code>move r1, r1</code>的指令，那么正好使用窥孔优化对这些无用的move进行消除，除此之外再实现一些其他的匹配规则。在Chakraborty[1]的文章中，总结了一些用窥孔优化实现的优化，除此之外，Tanenbaum等人[4]的文章中也罗列了上百种优化，我只实现了常量折叠和一些强度削弱和无用代码消除。</p>
+<p>需要注意一下，指令进行消除的时候不应该消除掉副作用，也就是说产生效果类似于<code>1/0</code>的指令是不应该消除的，否则除零异常就丢失了。</p>
+<p>如果可以匹配的规则很多，那么会明显拖慢优化器的运行速度，因为匹配的时候需要搜索的空间大了，根据一些研究结果来看，大部分的规则被匹配到的次数都是很少的，即使实现了比较少的规则一样也可以获得不错的优化效果。</p>
+<h2 id="参考文献">参考文献</h2>
+<p>[1] Chakraborty, Pinaki. 《Fifty Years of Peephole Optimization》. <em>CURRENT SCIENCE</em> 108, 期 12 (2015年): 5.</p>
+<p>[2] McKeeman, W. M. 《Peephole optimization》. <em>Communications of the ACM</em> 8, 期 7 (1965年): 443–44. https://doi.org/10.1145/364995.365000.</p>
+<p>[3] McKenzie, B J. 《Fast Peephole Optimization Techniques》, 不详, 15.</p>
+<p>[4] Tanenbaum, Andrew S., Hans van Staveren和Johan W. Stevenson. 《Using Peephole Optimization on Intermediate Code》. <em>ACM Transactions on Programming Languages and Systems</em> 4, 期 1 (1982年1月): 21–36. https://doi.org/10.1145/357153.357155.</p>
+<p>[5] Davidson, Jack W., 和Christopher W. Fraser. 《The Design and Application of a Retargetable Peephole Optimizer》. <em>ACM Transactions on Programming Languages and Systems</em> 2, 期 2 (1980年4月): 191–202. https://doi.org/10.1145/357094.357098.</p>
+<p>[6] Fischer, Charles N., Ron K. Cytron和Richard J. LeBlanc Jr. 《Crafting A Compiler》. 收入 <em>Crafting A Compiler</em>, 532–37. Addison-Wesley, 2009. https://book.douban.com/subject/4468660/.</p>
+<p>[7] Lambright, Dan. “Java bytecode optimizations.” <em>Proceedings IEEE COMPCON 97. Digest of Papers</em> (1997): 206-210.</p>
+<p>[8] Davidson, Jack W., 和Christopher W. Fraser. 《Automatic Inference and Fast Interpretation of Peephole Optimization Rules†》. <em>Software: Practice and Experience</em> 17, 期 11 (1987年11月): 801–12. https://doi.org/10.1002/spe.4380171104.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app">aana_h2</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app/articles/%E7%AA%A5%E5%AD%94%E4%BC%98%E5%8C%96/">https://blog-aana-h2.vercel.app/articles/窥孔优化/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog-aana-h2.vercel.app" target="_blank">A-Book Project</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%BC%96%E8%AF%91/">编译</a></div><div class="post_share"></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/articles/%E9%9D%99%E6%80%81%E5%8D%95%E8%B5%8B%E5%80%BC%E5%BD%A2%E5%BC%8F%EF%BC%881%EF%BC%89/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">静态单赋值形式（1）</div></div></a></div><div class="next-post pull-right"><a href="/articles/%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D%EF%BC%881%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">线性扫描寄存器分配（1）：基础介绍</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%AE%97%E6%B3%95%E5%92%8C%E6%95%B0%E6%8D%AE%E7%BB%93%E6%9E%84"><span class="toc-number">1.</span> <span class="toc-text">算法和数据结构</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%87%AA%E5%8A%A8%E7%94%9F%E6%88%90"><span class="toc-number">2.</span> <span class="toc-text">自动生成</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AE%9E%E7%8E%B0"><span class="toc-number">3.</span> <span class="toc-text">实现</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%82%E8%80%83%E6%96%87%E7%8C%AE"><span class="toc-number">4.</span> <span class="toc-text">参考文献</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By aana_h2</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>

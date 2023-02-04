@@ -1,0 +1,359 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>线性扫描寄存器分配（1）：基础介绍 | A-Book Project</title><meta name="author" content="aana_h2"><meta name="copyright" content="aana_h2"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="视频地址：Bilibili 这里所讲的内容主要来自于[1]，也就是最为基础的线性扫描寄存器分配方案，可以做到线性时间内进行寄存器分配，比起图着色分配是一种快的多的分配方案。 步骤 首先来介绍最基础的线性扫描分配器，大致分为下面：  计算出每个虚拟寄存器的活跃区间（Live Interval），根据活跃区间的起点进行排序。 从前到后进行扫描活跃区间列表。 进行分配并处理spill。  下面开始详细说">
+<meta property="og:type" content="article">
+<meta property="og:title" content="线性扫描寄存器分配（1）：基础介绍">
+<meta property="og:url" content="https://blog-aana-h2.vercel.app/articles/%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D%EF%BC%881%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D/index.html">
+<meta property="og:site_name" content="A-Book Project">
+<meta property="og:description" content="视频地址：Bilibili 这里所讲的内容主要来自于[1]，也就是最为基础的线性扫描寄存器分配方案，可以做到线性时间内进行寄存器分配，比起图着色分配是一种快的多的分配方案。 步骤 首先来介绍最基础的线性扫描分配器，大致分为下面：  计算出每个虚拟寄存器的活跃区间（Live Interval），根据活跃区间的起点进行排序。 从前到后进行扫描活跃区间列表。 进行分配并处理spill。  下面开始详细说">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-02-23T16:00:00.000Z">
+<meta property="article:modified_time" content="2023-01-31T08:06:04.776Z">
+<meta property="article:author" content="aana_h2">
+<meta property="article:tag" content="编译">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog-aana-h2.vercel.app/articles/%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D%EF%BC%881%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: '线性扫描寄存器分配（1）：基础介绍',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-01-31 16:06:04'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/admonition.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">31</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">16</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Book Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">线性扫描寄存器分配（1）：基础介绍</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-02-23T16:00:00.000Z" title="发表于 2022-02-24 00:00:00">2022-02-24</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-01-31T08:06:04.776Z" title="更新于 2023-01-31 16:06:04">2023-01-31</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>视频地址：<a target="_blank" rel="noopener" href="https://space.bilibili.com/1535266/video">Bilibili</a></p>
+<p>这里所讲的内容主要来自于[1]，也就是最为基础的线性扫描寄存器分配方案，可以做到线性时间内进行寄存器分配，比起图着色分配是一种快的多的分配方案。</p>
+<h2 id="步骤">步骤</h2>
+<p>首先来介绍最基础的线性扫描分配器，大致分为下面：</p>
+<ol type="1">
+<li>计算出每个虚拟寄存器的活跃区间（Live Interval），根据活跃区间的起点进行排序。</li>
+<li>从前到后进行扫描活跃区间列表。</li>
+<li>进行分配并处理spill。</li>
+</ol>
+<p>下面开始详细说明每个步骤如何进行操作。</p>
+<h3 id="计算活跃区间">计算活跃区间</h3>
+<p>首先对活跃区间进行计算。首先需要对指令进行一个编号，一个简单的方法是对指令进行深度优先标号（Deep First Numbering, DFN）。在进行了编号之后，通过活跃分析（live analysis）确定每个虚拟寄存器在程序的那些位置是活跃的，然后选出编号最大（<span class="math inline">\(j\)</span>）和最小（<span class="math inline">\(i\)</span>）的活跃点，组成活跃区间<span class="math inline">\([i,j]\)</span>。<span class="math inline">\(v\)</span>的活跃区间只需要保证在这个区间之外<span class="math inline">\(v\)</span>不会活跃就行了，不需要保证<span class="math inline">\(v\)</span>​在这个区间内是处处活跃的，这句话的意思在<strong>Fig 1</strong>能够体现出来。</p>
+
+
+<div style="display:flex; flex-direction:row; justify-content:space-around; align-items:flex-end">
+	<div>
+		<img src="dfn.svg"/>
+		<center><b>(a) 深度优先编号</b></center>
+	</div>
+	<div>
+		<img src="live-interval-1.svg"/>
+		<center><b>(b) 活跃区间</b></center>
+	</div>
+</div>
+
+<center>
+<b>Fig 1. 两个例子</b>
+</center>
+<p>如果两个虚拟变量的活跃区间发生了重叠，那么可以称这两个虚拟变量存在冲突，产生了冲突的两个变量不可以使用同一个寄存器，类似于<strong>Fig 1(b)</strong>中两个区间，就发生了重叠，那么就不可以使用同一个寄存器了。</p>
+<p>这里需要提到的是，对指令的编号会影响到代码生成的质量，因为在有些编号下活跃区间会更加短，更短的活跃区间会降低冲突的可能性[3]。比如下面的例子中，<code>then</code>分支使用了<span class="math inline">\(v\)</span>，但是<code>else</code>分支并没有使用v，同时<code>then</code>中的使用是最后一次使用，给<code>then</code>先编号会得到<strong>Fig 3(b)</strong>的结果，而给<code>else</code>先编号则会得到<strong>Fig 3(a)</strong>的结果。</p>
+<figure>
+<img src="if-else-then.svg" alt="if-else-then" /><figcaption>if-else-then</figcaption>
+</figure>
+<center>
+<b>Fig 2. 一个if-then-else控制流，其中v只在then中被使用</b>
+</center>
+<figure>
+<img src="different-range.svg" alt="different-range" /><figcaption>different-range</figcaption>
+</figure>
+<center>
+<b>Fig 3. 两种不同的编号方式</b>
+</center>
+<p>很容易发现，一些活跃区间会出现类似于<strong>Fig 3(a)</strong>的空洞，如果另外一个活跃区间正好在这个空洞里面，就不会发生冲突，不过我们这里并不利用这种空洞，而是简单地将活跃区间从头到尾当成一个整体。</p>
+<h3 id="对活跃区间线性扫描">对活跃区间线性扫描</h3>
+<p>接下来对活跃区间进行扫描，在进行扫描之前首先对所有的活跃区间进行排序，根据区间开始点从低到高。排序后的活跃区间很适合进行线性扫描，对活跃区间的迭代的顺序和标号顺序是一样的。</p>
+<p>下面开始，假设一共有<span class="math inline">\(R\)</span>个可供分配的寄存器。有一个链表<span class="math inline">\(active\)</span>，用于存放覆盖了当前位置的活跃区间，<span class="math inline">\(active\)</span>根据每个区间的终点从高到低进行排列，反过来也行，这样有利于减少查找的次数。</p>
+<p>每次向前扫描可以遇到一个新的活跃区间<span class="math inline">\(I_{new}\)</span>，用<span class="math inline">\(I_{new}\)</span>的起点<span class="math inline">\(i\)</span>和<span class="math inline">\(active\)</span>链表中的每个区间<span class="math inline">\(I_{old}\)</span>的终点<span class="math inline">\(j\)</span>进行对比，如果出现了<span class="math inline">\(j \le i\)</span>，那么就将<span class="math inline">\(I_{old}\)</span>从<span class="math inline">\(active\)</span>中移除，这个时候可以认为<span class="math inline">\(I_{old}\)</span>以及被完全处理了，不需要再次进行考虑。</p>
+<p>再进行了对<span class="math inline">\(active\)</span>的更新之后，如果<span class="math inline">\(size(active) \ge R\)</span>那么此时必须要将链表中的某个<span class="math inline">\(I_{old}\)</span>或者是<span class="math inline">\(I_{new}\)</span>进行spill，可以使用多种方式决定到底需要将那个区间进行spill，这里给出一个heuristic，就是使用结束位置最后的一个区间进行spill，这么做的原因是，因为结束的位置最后，所以会延续很长因此可能会导致更多的区间被溢出，如果使用了区间的终点从高到低进行排列，那么<span class="math inline">\(active\)</span>中最后结束的就是第一个。除此之外还可以通过区间的使用频率的等信息进行判断。</p>
+<p><strong>Fig 4</strong>是一个来自[1]的例子，一共有两个可用的寄存器，即<span class="math inline">\(R=2\)</span>。</p>
+<figure>
+<img src="image-20220408235832498.png" alt="image-20220408235832498" /><figcaption>image-20220408235832498</figcaption>
+</figure>
+<center>
+<b>(a) 五个活跃区间，其中B和E首位相连</b>
+</center>
+<table>
+<thead>
+<tr class="header">
+<th></th>
+<th style="text-align: center;">active intervals</th>
+<th style="text-align: center;">available registers</th>
+<th style="text-align: center;">spilled intervals</th>
+<th style="text-align: center;">allocation results</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>初始</td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{r_1,r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+</tr>
+<tr class="even">
+<td>A</td>
+<td style="text-align: center;"><span class="math inline">\(\{A=r_1\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+</tr>
+<tr class="odd">
+<td>B</td>
+<td style="text-align: center;"><span class="math inline">\(\{A=r_1,B=r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+</tr>
+<tr class="even">
+<td>C</td>
+<td style="text-align: center;"><span class="math inline">\(\{A=r_1,B=r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{C\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+</tr>
+<tr class="odd">
+<td>D</td>
+<td style="text-align: center;"><span class="math inline">\(\{D=r_1,B=r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{C\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{A=r_1\}\)</span></td>
+</tr>
+<tr class="even">
+<td>E</td>
+<td style="text-align: center;"><span class="math inline">\(\{D=r_1,E=r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{C\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{A=r_1,B=r_2\}\)</span></td>
+</tr>
+<tr class="odd">
+<td>结束</td>
+<td style="text-align: center;"><span class="math inline">\(\{\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{r_1,r_2\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{C\}\)</span></td>
+<td style="text-align: center;"><span class="math inline">\(\{A=r_1,B=r_2,D=r_1,E=r_2\}\)</span></td>
+</tr>
+</tbody>
+</table>
+<center>
+<b>(b) 每次迭代后的结果</b>
+</center>
+<center>
+<b>Fig 4. 一个典型的例子</b>
+</center>
+<h3 id="进行分配和处理spill">进行分配和处理spill</h3>
+<p>一个区间进行了spill之后，就不再占有任何一个寄存器了，但是在使用点依旧需要对寄存器进行使用，所以在使用点可以使用任意一个寄存器，临时寄存器的选取只要保证即可不和指令内其他寄存器重复即可。此时，需要为虚拟变量在栈上分配一个空间，在对虚拟变量进行赋值之后要将值回存到栈上的空间。由于需要占用其他寄存器，那么可能会破坏寄存器中的值，所以还需要另外一个栈上的空间能够存放被临时占用的寄存器的值。</p>
+<p>下面的例子来对spill的结果进行展示：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line">move 10, a // a = 10</span><br><span class="line">......</span><br><span class="line">add a, b, c // c = a + b</span><br><span class="line">......</span><br><span class="line">move a, w // w = a</span><br><span class="line">......</span><br><span class="line">move 13, a // a = 13</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<p>这里假设<code>a</code>被溢出了，在栈上分配了两个位置（<code>m1</code>、<code>m2</code>），而其他的变量（<code>b</code>、<code>c</code>、<code>w</code>）均被分配到了寄存器（<code>r1</code>、<code>r2</code>、<code>r3</code>），那么在对这个程序进行改写之后得到的程序如下：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br></pre></td><td class="code"><pre><span class="line">......</span><br><span class="line">store r1, m2</span><br><span class="line">load m1, r1</span><br><span class="line">move 10, r1 // a使用r1</span><br><span class="line">store r1, m1</span><br><span class="line">load m2, r1</span><br><span class="line">......</span><br><span class="line">store r3, m2</span><br><span class="line">load m1, r3</span><br><span class="line">add r3, r1, r2 // a使用r3</span><br><span class="line">store r3, m1</span><br><span class="line">load m2, r3</span><br><span class="line">......</span><br><span class="line">store r1, m2</span><br><span class="line">load m1, r1</span><br><span class="line">move r1, r3 // a使用r1</span><br><span class="line">store r1, m1</span><br><span class="line">load m2, r1</span><br><span class="line">......</span><br><span class="line">store r1, m2</span><br><span class="line">load m1, r1</span><br><span class="line">move 13, r1 // a 使用r1</span><br><span class="line">store r1, m1</span><br><span class="line">load m2, r1</span><br><span class="line">......</span><br></pre></td></tr></table></figure>
+<p>用这个方法来处理spill确实不是很好，但是却很直观，对于spill有很多可以优化的地方，插入spill代码的方式对于性能的影响很大，由于这里的最简单的情况，所以就不介绍有关spill代码的优化了，其实看上面的例子也能看出来有好几个直观的改善方式，比如被溢出的变量作为<code>move</code>指令的目标的时候，根本不会用到它的值，所以可以将<code>move</code>改写为<code>store</code>，直接将值存入栈中，不过这些都需要更加复杂的rewriter。</p>
+<h3 id="调用规约和寄存器预分配">调用规约和寄存器预分配</h3>
+<p>在一些架构上，有的指令必须要使用某个特定的寄存器，<code>return</code>可能必须使用<code>v0</code>来存放返回值。为了保证<code>return</code>语句一定可以使用的了<code>v0</code>寄存器，需要预先进行寄存器分配，也就是生成的<code>return</code>不应该使用虚拟寄存器（<code>return r0</code>）而是直接使用物理寄存器（<code>return v0</code>）。然后在原有的活跃区间中加入被预先分配了的物理寄存器的活跃区间，物理寄存器活跃区间的计算方式和虚拟寄存器是一样的。</p>
+<p>虽然物理寄存器的处理方式和虚拟寄存器类似，但是，按照之前给出的对溢出的处理方式来看，物理寄存器的是不允许进行溢出的，因为在进行了溢出之后无法保证原有的指令能够继续使用预分配的寄存器，比如有下面的情况：</p>
+<figure class="highlight plaintext"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">add a, b, r0</span><br><span class="line">// 将r0溢出了，将r0分配给了a。</span><br><span class="line">add r0, r1, r0</span><br><span class="line">// 发生了冲突。</span><br></pre></td></tr></table></figure>
+<p>说完了如何进行寄存器的预分配，来说说调用规约的实现。对于模拟callee-saved寄存器来说，可以在方法的入口处存在对callee-saved寄存器的定值，在方法的出口处存在对callee-saved寄存器的使用，这样，就会产生一个横跨整个方法的活跃区间，同时预分配的寄存器不能溢出，会导致callee-saved寄存器实际上不能被使用。最简单的解决方式是，对所有在方法中被使用的callee-saved寄存器，在入口处保存到栈中，在出口处恢复。</p>
+<p>模拟caller-saved寄存器，则需要让call指令使用所有的caller-saved寄存器进行模拟，由于预分配寄存器不允许进行spill，那么在处理call指令时会将使用了caller-saved寄存器的跨调用活跃区间全部溢出，会对产生非常多的load/store指令，更加糟糕的是，如果方法内存在多个调用点，那么对caller-saved寄存器的使用会连起来，导致很大一个范围内都无法使用caller-saved寄存器，基础的线性扫描不能很好地解决这个问题。</p>
+<p>为了缓解这个问题，可以考虑将所有的跨调用存活的变量存入到栈中，调用结束后加载到另外的虚拟变量中，这样相当于将区间截断为两个了，不过这样很麻烦，要进行重命名。或者是不对caller-saved行为进行模拟，也就是call指令不不使用它们，而是在每个call之前保存所有的caller-saved寄存器，调用结束之后进行恢复。如果要实现一个线性扫描寄存器分配的话选第二种方案就好了。</p>
+<h2 id="解释几个可能的问题">解释几个可能的问题</h2>
+<h3 id="为什么是线性的">为什么是线性的？</h3>
+<p>因为按照了活跃区间的先后顺序进行的扫描，所以叫做线性扫描，上面的算法就是按照了每个活跃区间的开始处位置进行了排序然后再进行的扫描，也不会进行任何回溯。同时线性扫描寄存器分配的时间复杂度也是线性的。</p>
+<h3 id="有没有非线性的">有没有非线性的？</h3>
+<p>有的，可以给每个活跃区间一个优先级，然后按照优先级顺序进行扫描，比如先给所有活跃区间短，但是可能使用次数较多的的虚拟变量更高的优先级，使其先被分配。LLVM中的<a target="_blank" rel="noopener" href="https://blog.llvm.org/2011/09/greedy-register-allocation-in-llvm-30.html">Basic和Greedy</a>寄存器分配使用的就是基于spill weight进行排序的优先队列进行的。</p>
+<h3 id="为什么说会比图着色寄存器分配速度更加快">为什么说会比图着色寄存器分配速度更加快？</h3>
+<p>因为线性扫描分配器没有构建一个全局的冲突图，而是使用了局部的冲突信息，也就是只关注了当前进行分配的live interval和当前active列表中或者inactive列表中的冲突，另外不会像图着色分配器一样反复地构建冲突图。</p>
+<h2 id="引用">引用</h2>
+<p>[1] M. Poletto和V. Sarkar, 《Linear scan register allocation》, <em>ACM Trans. Program. Lang. Syst.</em>, 卷 21, 期 5, 页 895–913, 9月 1999, doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1145/330249.330250">10.1145/330249.330250</a>.</p>
+<p>[2] C. Wimmer和H. Mössenböck, 《Optimized interval splitting in a linear scan register allocator》, 收入 <em>Proceedings of the 1st ACM/USENIX international conference on Virtual execution environments - VEE ’05</em>, Chicago, IL, USA, 2005, 页 132. doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1064979.1064998">10.1145/1064979.1064998</a>.</p>
+<p>[3] C. Wimmer和M. Franz, 《Linear scan register allocation on SSA form》, 收入 <em>Proceedings of the 8th annual IEEE/ ACM international symposium on Code generation and optimization - CGO ’10</em>, Toronto, Ontario, Canada, 2010, 页 170. doi: <a target="_blank" rel="noopener" href="https://doi.org/10.1145/1772954.1772979">10.1145/1772954.1772979</a>.</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app">aana_h2</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app/articles/%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D%EF%BC%881%EF%BC%89%EF%BC%9A%E5%9F%BA%E7%A1%80%E4%BB%8B%E7%BB%8D/">https://blog-aana-h2.vercel.app/articles/线性扫描寄存器分配（1）：基础介绍/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog-aana-h2.vercel.app" target="_blank">A-Book Project</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/%E7%BC%96%E8%AF%91/">编译</a></div><div class="post_share"></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/articles/%E7%AA%A5%E5%AD%94%E4%BC%98%E5%8C%96/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">窥孔优化</div></div></a></div><div class="next-post pull-right"><a href="/articles/%E5%9B%BE%E7%9D%80%E8%89%B2%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">图着色寄存器分配</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E6%AD%A5%E9%AA%A4"><span class="toc-number">1.</span> <span class="toc-text">步骤</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%AE%A1%E7%AE%97%E6%B4%BB%E8%B7%83%E5%8C%BA%E9%97%B4"><span class="toc-number">1.1.</span> <span class="toc-text">计算活跃区间</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AF%B9%E6%B4%BB%E8%B7%83%E5%8C%BA%E9%97%B4%E7%BA%BF%E6%80%A7%E6%89%AB%E6%8F%8F"><span class="toc-number">1.2.</span> <span class="toc-text">对活跃区间线性扫描</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BF%9B%E8%A1%8C%E5%88%86%E9%85%8D%E5%92%8C%E5%A4%84%E7%90%86spill"><span class="toc-number">1.3.</span> <span class="toc-text">进行分配和处理spill</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%B0%83%E7%94%A8%E8%A7%84%E7%BA%A6%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8%E9%A2%84%E5%88%86%E9%85%8D"><span class="toc-number">1.4.</span> <span class="toc-text">调用规约和寄存器预分配</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%A7%A3%E9%87%8A%E5%87%A0%E4%B8%AA%E5%8F%AF%E8%83%BD%E7%9A%84%E9%97%AE%E9%A2%98"><span class="toc-number">2.</span> <span class="toc-text">解释几个可能的问题</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E6%98%AF%E7%BA%BF%E6%80%A7%E7%9A%84"><span class="toc-number">2.1.</span> <span class="toc-text">为什么是线性的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%9C%89%E6%B2%A1%E6%9C%89%E9%9D%9E%E7%BA%BF%E6%80%A7%E7%9A%84"><span class="toc-number">2.2.</span> <span class="toc-text">有没有非线性的？</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%B8%BA%E4%BB%80%E4%B9%88%E8%AF%B4%E4%BC%9A%E6%AF%94%E5%9B%BE%E7%9D%80%E8%89%B2%E5%AF%84%E5%AD%98%E5%99%A8%E5%88%86%E9%85%8D%E9%80%9F%E5%BA%A6%E6%9B%B4%E5%8A%A0%E5%BF%AB"><span class="toc-number">2.3.</span> <span class="toc-text">为什么说会比图着色寄存器分配速度更加快？</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-number">3.</span> <span class="toc-text">引用</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By aana_h2</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>if (!window.MathJax) {
+  window.MathJax = {
+    tex: {
+      inlineMath: [ ['$','$'], ["\\(","\\)"]],
+      tags: 'ams'
+    },
+    chtml: {
+      scale: 1.1
+    },
+    options: {
+      renderActions: {
+        findScript: [10, doc => {
+          for (const node of document.querySelectorAll('script[type^="math/tex"]')) {
+            const display = !!node.type.match(/; *mode=display/)
+            const math = new doc.options.MathItem(node.textContent, doc.inputJax[0], display)
+            const text = document.createTextNode('')
+            node.parentNode.replaceChild(text, node)
+            math.start = {node: text, delim: '', n: 0}
+            math.end = {node: text, delim: '', n: 0}
+            doc.math.push(math)
+          }
+        }, ''],
+        insertScript: [200, () => {
+          document.querySelectorAll('mjx-container').forEach(node => {
+            if (node.hasAttribute('display')) {
+              btf.wrap(node, 'div', { class: 'mathjax-overflow' })
+            } else {
+              btf.wrap(node, 'span', { class: 'mathjax-overflow' })
+            }
+          });
+        }, '', false]
+      }
+    }
+  }
+  
+  const script = document.createElement('script')
+  script.src = 'https://cdn.jsdelivr.net/npm/mathjax/es5/tex-mml-chtml.min.js'
+  script.id = 'MathJax-script'
+  script.async = true
+  document.head.appendChild(script)
+} else {
+  MathJax.startup.document.state(0)
+  MathJax.texReset()
+  MathJax.typeset()
+}</script><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>
