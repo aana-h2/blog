@@ -1,0 +1,313 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>Bash脚本基础 | A-Blog Project</title><meta name="author" content="aana_h2"><meta name="copyright" content="aana_h2"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="总是还不会太会用bash，所以用的时候总是到处去查感觉非常麻烦，虽然之前学过，但是可惜，忘得差不多了，而且学的也不系统。其实bash和cmake非常类似，在学会了cmake语法之后，学习bash也就很容易理解了。 变量、表达式和作用域 定义一个变量的方式是：a&#x3D;100，这样就定义了一个变量，但是需要注意bash和cmake中都没存在整数类型这回事，唯一存在的就是字符串，但是可以将字符串解释为数字。">
+<meta property="og:type" content="article">
+<meta property="og:title" content="Bash脚本基础">
+<meta property="og:url" content="https://blog-aana-h2.vercel.app/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/Bash/20230207Bash%E8%84%9A%E6%9C%AC%E5%9F%BA%E7%A1%80/main/index.html">
+<meta property="og:site_name" content="A-Blog Project">
+<meta property="og:description" content="总是还不会太会用bash，所以用的时候总是到处去查感觉非常麻烦，虽然之前学过，但是可惜，忘得差不多了，而且学的也不系统。其实bash和cmake非常类似，在学会了cmake语法之后，学习bash也就很容易理解了。 变量、表达式和作用域 定义一个变量的方式是：a&#x3D;100，这样就定义了一个变量，但是需要注意bash和cmake中都没存在整数类型这回事，唯一存在的就是字符串，但是可以将字符串解释为数字。">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2023-02-07T08:05:00.000Z">
+<meta property="article:modified_time" content="2023-02-08T08:45:27.000Z">
+<meta property="article:author" content="aana_h2">
+<meta property="article:tag" content="shell">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog-aana-h2.vercel.app/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/Bash/20230207Bash%E8%84%9A%E6%9C%AC%E5%9F%BA%E7%A1%80/main/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'Bash脚本基础',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: true,
+  postUpdate: '2023-02-08 16:45:27'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/admonition.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">34</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Blog Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">Bash脚本基础</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2023-02-07T08:05:00.000Z" title="发表于 2023-02-07 16:05:00">2023-02-07</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-02-08T08:45:27.000Z" title="更新于 2023-02-08 16:45:27">2023-02-08</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>总是还不会太会用bash，所以用的时候总是到处去查感觉非常麻烦，虽然之前学过，但是可惜，忘得差不多了，而且学的也不系统。其实bash和cmake非常类似，在学会了cmake语法之后，学习bash也就很容易理解了。</p>
+<h2 id="变量表达式和作用域">变量、表达式和作用域</h2>
+<p>定义一个变量的方式是：<code>a=100</code>，这样就定义了一个变量，但是需要注意bash和cmake中都没存在整数类型这回事，唯一存在的就是字符串，但是可以将字符串解释为数字。</p>
+<p>变量要使用可以通过类似于<code>$a</code>的方式，这样就会将<code>$a</code><strong>替换（substitution）</strong>为变量的值，<code>$a</code>其实是<code>$&#123;a&#125;</code>的缩写，还要两种替换方式<code>$(())</code>和<code>$()</code>，分别用于表达式计算和获取子进程输出。</p>
+<p>可以认为bash维持了一个map，从变量名到变量值，而<code>$</code>就是进行一个文本的替换，但是和cmake中不同的是，没有办法进行嵌套的替换，即<code>$&#123;$&#123;a&#125;&#125;</code>是非法的。</p>
+<p>变量有两种作用域，一个是全局，一个是局部的，默认为使用全局作用域，因此体现的结果和动态作用域是类似的，使用局部变量需要使用<code>local</code>。</p>
+<p>对于算术运算，首先需要将字符串解释为数字，然后才在<code>$(())</code>中进行，例如<code>a=10; b=13; c=$((a+b))</code>，当然也可以使用另外一种方式就是<code>let</code>关键字（也许是命令），<code>let</code>将后面的表达式进行解释执行，刚才的表达式可以改写为<code>let c=a+b</code>。有时候只希望进行运算，并不希望产生一个替换，这个时候只需要直接使用<code>(())</code>就行了，比如<code>((a=10))</code>，尝试一下就知道两者的差异了。</p>
+<p>另外，对于bash来说，运算符和运算数之间不能有空格，因为如果有空格的话会认为是参数，例如<code>a = 5</code>，会认为执行命令<strong>a</strong>，然后将<strong>=</strong>和<strong>5</strong>作为参数，因此必须连着写为<code>a=5</code>，这样才是一个完整的命令。</p>
+<h2 id="分支">分支</h2>
+<p>就挺奇怪的，我很久也没搞懂bash的分支循环到底怎么写的……因为这玩意好像有不同的语法，在不同版本的shell之间有兼容性问题。</p>
+<p>一个简单的分支语句的写法如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a=100</span><br><span class="line"><span class="keyword">if</span> [ a -eq 100 ]</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="string">&quot;a equal 100.&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+<p>其中条件表达式写在一对方括号中，在一个方括号中只能存在一个条件，如果多个条件需要写在多个方括号中，多个方括号使用bool运算符进行连接，同时需要注意，表达式和括号之间一定要存在空格。</p>
+<p>在bash中支持的比较条件有三类：1、字符串比较（<code>=</code>）。2、数字比较（<code>-eq</code>）。3、文件信息(<code>-e</code>)。需要注意，如果运算数不能够转换为数字，那么数字比较会报错。</p>
+<p>方括号是test命令的一个语法糖，如果上面的代码可以改写为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a=100</span><br><span class="line"><span class="keyword">if</span> <span class="built_in">test</span> a -eq 100</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="string">&quot;a equal 100.&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+<p>当表达式成立时，test命令会返回0，否则返回1，在bash中0代表执行成功，也就是说会被if当做true来处理，进一步的说，在if后面可以放任意的命令，比如echo这种都行，而且能够使用逻辑运算符进行连接，如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">if</span> <span class="built_in">echo</span> aa &amp;&amp; <span class="built_in">echo</span> bbb</span><br><span class="line"><span class="keyword">then</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="string">&quot;???&quot;</span></span><br><span class="line"><span class="keyword">fi</span></span><br></pre></td></tr></table></figure>
+<p>我们应该经常会在命令行里面使用<code>&amp;&amp;</code>来同时执行多条命令，其中的原理就在这里，会对命令的返回值进行处理与操作。</p>
+<p>还有<code>else</code>和<code>elif</code>就非常简单了，可以直接略过，直接来看<code>switch</code>就行了：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">case</span> <span class="variable">$1</span> <span class="keyword">in</span></span><br><span class="line">	a)</span><br><span class="line">		<span class="built_in">echo</span> abcde</span><br><span class="line">		;;</span><br><span class="line">	b)</span><br><span class="line">		<span class="built_in">echo</span> bcde</span><br><span class="line">		;;</span><br><span class="line">	c)</span><br><span class="line">		<span class="built_in">echo</span> cde </span><br><span class="line">		;;</span><br><span class="line">	d | e) <span class="comment"># 用|匹配多项</span></span><br><span class="line">		<span class="built_in">echo</span> over</span><br><span class="line">		;;</span><br><span class="line">	*)</span><br><span class="line">		<span class="built_in">echo</span> bad input!</span><br><span class="line">		;;</span><br><span class="line"><span class="keyword">esac</span></span><br></pre></td></tr></table></figure>
+<p>还是需要记住，在bash中只有字符串并没有数字这种东西，所以switch的匹配是基于字符串来进行的，那么实际上可以使用正则表达式，实际上最后一项<code>*)</code>就是一个正则表达式。其他的注意一下语法就行了，没有什么特殊的。</p>
+<h2 id="循环">循环</h2>
+<p>在学会了使用分支之后循环也非常简单了。</p>
+<p>while比较简单，和大多数编程语言的while差不多：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">a=10</span><br><span class="line"><span class="keyword">while</span> [ <span class="variable">$a</span> -gt 0 ]</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$a</span></span><br><span class="line">	((a--))</span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>for的比较复杂，有三种不同的形态。</p>
+<p>第一种是进行列表迭代：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a=<span class="string">&quot;1 2 3&quot;</span></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> <span class="variable">$a</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>虽然a实际上是个字符串，但是确实可以当做列表一样被迭代，它使用空格对各项进行了分隔，在后面我们会看到如何进行真正的列表迭代。</p>
+<p>还有另外一种方式以获取迭代的列表：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> file <span class="keyword">in</span> $(<span class="built_in">ls</span>)</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$file</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>第二种是进行范围迭代：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> &#123;1..10&#125;</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>通过<code>&#123;1..10&#125;</code>声明了一个范围，可以认为生成了一个从1到10的列表就行了，好像是seq命令的语法糖，我也不清楚，不过差不多。</p>
+<p>第三种是C风格的for：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">a=13</span><br><span class="line"><span class="keyword">for</span> (( i=<span class="number">0</span>; i&lt;<span class="number">10</span> &amp;&amp; a==<span class="number">13</span>; i++ ))</span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">    <span class="built_in">echo</span> <span class="variable">$i</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>注意一下，i其实是个全局的，另外括号中对于空格没有要求，有没有空格都行，不过风格尽量统一。</p>
+<p>感觉三种都非常有用啊……</p>
+<p>至于break和continue，它们和一般的编程语言是一样的。</p>
+<h2 id="函数">函数</h2>
+<p>一个简单的函数如下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">say_hello</span></span>() &#123;</span><br><span class="line">	<span class="built_in">echo</span> hello</span><br><span class="line">	<span class="built_in">return</span> $?;</span><br><span class="line">&#125;</span><br><span class="line"></span><br><span class="line">say_hello</span><br></pre></td></tr></table></figure>
+<p>上面的代码中定义然后调用了一个函数<code>say_hello</code>，不过没有任何参数，实际上那个括号<code>()</code>只有装饰作用……并不能够用来接收参数，接收参数还是使用<code>$0 $1</code>这些，同时返回值只是返回执行的状态，也就是返回0-255之间的整数，0表示执行成功，要想返回值需要通过其他的方式来进行。</p>
+<p>这里有两个方式，一个方式是让它专门设置一个返回值，比如：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">get_int</span></span>() &#123;</span><br><span class="line">	return_value=100</span><br><span class="line">	<span class="built_in">return</span> 0</span><br><span class="line">&#125;</span><br><span class="line">get_int</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$return_value</span></span><br></pre></td></tr></table></figure>
+<p>这种方式实在麻烦，必须要知道使用了那个变量返回，还要小心冲突才行。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span> <span class="function"><span class="title">get_int</span></span>() &#123;</span><br><span class="line">	<span class="built_in">echo</span> 100</span><br><span class="line">	<span class="built_in">return</span> 0</span><br><span class="line">&#125;</span><br><span class="line"><span class="built_in">echo</span> $(get_int)</span><br></pre></td></tr></table></figure>
+<p>如果没看明白<code>$()</code>是什么意思也没事，这个就是获取程序的输出的，在后面自然会看到，总之这个是另外一种替换，就是将命令或者函数的输出替换到这里。</p>
+<p>如果有些echo的输出不需要，那么可以使用重定向到<code>/dev/null</code>，但是这样还是不方便，如果要有返回值，又要能够进行echo就麻烦了。</p>
+<p>所以这里可以看出来，一个函数和一个命令的表现是差不多的，无论是返回值的处理还是调用的方式上。</p>
+<h2 id="列表">列表</h2>
+<p>列表的处理当然必不可少，定义一个列表的方式如下：<code>arr=(1 2 3 4)</code>，下面来输出一下这个列表。</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">arr=(1 2 3 4)</span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;arr[0]&#125;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;arr[1]&#125;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;arr[2]&#125;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="variable">$&#123;arr[3]&#125;</span></span><br></pre></td></tr></table></figure>
+<p>上面的代码将列表中值逐个输出了，可以看出来，访问列表元素和C语言中没有上面不同，只不过需要放在<code>$&#123;&#125;</code>内，之前就提到过，它是变量替换的完全写法，如果使用<code>echo $arr</code>只会输出第一个元素，虽然有点奇怪，但是就是这样的。</p>
+<p>下面用循环来实现一下：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">arr=(1 2 3 4)</span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> <span class="variable">$&#123;arr[@]&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>有个奇怪的地方<code>$&#123;arr[@]&#125;</code>，它干了什么？echo一下就知道了，实际上是输出为了<code>1 2 3 4</code>，也就是说先替换字符串的<code>1 2 3 4</code>，然后再根据空格去逐个迭代，这个和我们在for中看到的是一样的。</p>
+<p>除了这种方式迭代，还可以使用下标来进行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">arr=(1 2 3 4)</span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> <span class="variable">$&#123;!arr[@]&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$&#123;arr[$n]&#125;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p><code>echo $&#123;!arr[@]&#125;</code>的输出为<code>0 1 2 3</code>，此外<code>echo ${#arr[@]}</code>输出其长度。</p>
+<p>列表还有其他的操作方式，可以进行拼接和转换：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">arr=(1 2 3 4)</span><br><span class="line">arr+=(5 6 7) <span class="comment"># 使用+=进行拼接</span></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> <span class="variable">$&#123;arr[@]&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br></pre></td><td class="code"><pre><span class="line">str=<span class="string">&quot;1 2 3 4 5&quot;</span></span><br><span class="line">arr=(<span class="variable">$str</span>) <span class="comment"># 替换之后会形成一个列表，想象一下替换之后就是(1 2 3 4 5)，不带引号。</span></span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> <span class="variable">$&#123;arr[@]&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br><span class="line"></span><br><span class="line">arr=($(<span class="built_in">ls</span>))</span><br><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> <span class="variable">$&#123;arr[@]&#125;</span></span><br><span class="line"><span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<h2 id="字符串处理">字符串处理</h2>
+<p>刚才也能看到，字符串处理和列表处理很有关系，事实上字符串处理相当重要，不过感觉知道如何遍历、拼接、取子串就够了。</p>
+<h3 id="拼接">拼接</h3>
+<p>拼接非常简单，两个做法：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a=<span class="string">&#x27;abc&#x27;</span></span><br><span class="line">a+=<span class="string">&#x27;123&#x27;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;a=<span class="variable">$a</span>&quot;</span></span><br><span class="line">a=<span class="string">&quot;<span class="variable">$&#123;a&#125;</span>efg&quot;</span></span><br></pre></td></tr></table></figure>
+<p>一个是使用<code>+=</code>，这个和处理列表是一样的，还有一个就是直接放在双引号里面，为什么是双引号呢，下面的转义处理会提到。</p>
+<h3 id="遍历">遍历</h3>
+<p>其实没有办法通过基于范围的迭代来操作，因为在创建范围的<code>&#123;&#125;</code>中不能进行替换，只能通过C风格的方式来进行：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">a=<span class="string">&#x27;abcdefg&#x27;</span></span><br><span class="line"><span class="keyword">for</span> ((i=<span class="number">0</span>; i&lt; <span class="variable">$&#123;#a&#125;</span>; i++)) <span class="keyword">do</span></span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$&#123;a:$i:1&#125;</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>首先通过<code>${#a}</code>求取了字符串长度，然后通过<code>$&#123;a:$i:1&#125;</code>访问了第i个字符，由于并不存在能够访问单独一个字符的方式，所以用的是子串的访问语法。</p>
+<h3 id="子串">子串</h3>
+<p>取子串的方式上面已经提到了，比较常用的应该就两个。</p>
+<p><code>$&#123;string:position&#125;</code>，给一个字符串变量string，然后取从position后的全部。</p>
+<p><code>$&#123;string:position:length&#125;</code>，给一个字符串变量string，从position位置取长度为length的子串。</p>
+<h2 id="转义处理">转义处理</h2>
+<p>很多的符号有特殊的意义，所以bash会对其进行处理，比如<code>$</code>代表了要进行一个替换（应该多数情况是这样的，我只是进行一下概括），所以<code>$</code>后面的字符有不同的含义，但是有时候并不需要进行这种处理，所以可以使用反斜杠（<code>\</code>）来进行转义，让<code>$</code>变为一个普通的字符。</p>
+<p>字符串使用单引号（<code>'</code>）和双引号（<code>&quot;</code>）也有不同[5]，在单引号中，不会产生转义，一切都是原样的，而在双引号中，转义会发生：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">a=100</span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;in double quote a is <span class="variable">$a</span>&quot;</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&#x27;in single quote a is $a&#x27;</span></span><br></pre></td></tr></table></figure>
+<h2 id="子进程">子进程</h2>
+<p>在上面提到替换的时候应该就看到了，可以使用子进程的输出来进行替换，如<code>$(echo &quot;abc&quot;)</code>会被替换为<code>abc</code>，所以<code>a=$(echo &quot;abc&quot;)</code>会让a值为<code>abc</code>。</p>
+<h2 id="特殊变量">特殊变量</h2>
+<p>有一些特殊的变量。</p>
+<p><code>$?</code>：子程序执行状态，如果成功为0，除此之外的都是执行产生异常</p>
+<p><code>$@</code>：所有参数形成的列表</p>
+<p><code>$0</code>：脚本名，和C语言里面第0个参数意义相同</p>
+<p><code>$#</code>：参数个数，不会算上第0个</p>
+<p><code>$1-$9</code>：参数1-9</p>
+<p><code>$$</code>：当前进程号</p>
+<h2 id="io重定向">IO重定向</h2>
+<p>在bash中执行命令时，输入输出可以被重定向。</p>
+<h3 id="输出重定向">输出重定向</h3>
+<p>输出重定向用的比较多一点先来说说它好了，非常多的时候，需要将程序的输出放到一个文件里面，或者直接忽略掉，输出重定向符号一共有下面三种[3]。</p>
+<ol type="1">
+<li><code>&gt;</code> Syntax: <em>文件描述符（可选）</em> <code>&gt;</code> <em>文件名</em></li>
+<li><code>&gt;&amp;</code> Syntax: <em>文件描述符（可选）</em> <code>&gt;&amp;</code> <em>文件描述符</em></li>
+<li><code>&amp;&gt;</code> Syntax: <code>&amp;&gt;</code> <em>文件名</em></li>
+</ol>
+<p>第一种是最简单的情况，就是让文件描述符关联到指定的文件，比如<code>1 &gt; log</code>，是从标准输出重定向到文件log，也可以简写为<code>&gt; log</code>，默认就是将文件描述符1进行重定向，另外使用<code>&gt;&gt;</code>是进行对一个文件进行追加的方式打开（可以看看文件的打开属性的内容）。</p>
+<p>第二种有所区别，通常会的使用方式为<code>&gt; log 2&gt;&amp;1</code>，意思是首先将文件描述符1关联到log，然后将文件描述符2（2代表stderr，标准错误）关联到和文件描述符1相同的文件，所以可以认为<code>&amp;</code>就是获取了文件描述符1的关联文件，因此，先后顺序是重要的，如果反过来写成<code>2&gt;&amp;1 &gt; log</code>是不行的。同样<code>&gt;&amp;</code>前面的文件描述符也是可选的，默认为1，不过用默认值没有什么意义。</p>
+<p>第三种其实是第二种的一个简写，<code>&amp;&gt; log</code>实际上相当于<code>1&gt;log 2&gt;&amp;log</code>，在<code>&amp;&gt;</code>前面不需要放文件描述符，不过我个人感觉还是不要用简写的好，因为不容易读懂。</p>
+<h3 id="输入重定向">输入重定向</h3>
+<p>输入重定向也有3种。</p>
+<ol type="1">
+<li><code>&lt;</code> Syntax: <code>&lt;</code>文件名</li>
+<li><code>&lt;&lt;</code></li>
+<li><code>&lt;&lt;&lt;</code> Syntax: <code>&lt;&lt;&lt;</code>字符串</li>
+</ol>
+<p>第一种最简单，使用的方法就是将一个文件的内容作为命令的输入，<code>echo &lt; log</code>。</p>
+<p>第二种则是所谓的<code>here-document</code>，在后面的多行参数小节中，我们再来说说吧。</p>
+<p>第三种是<code>here-string</code>，就是将一个字符串作为输入给命令，和管道符有一些差别，在管道符部分会进行说明。</p>
+<p>对于输入重定向，有一个常见的错误就是以为用输入重定向可以提供命令行参数。args文件中有一个字符串<code>1 2 3 4 5</code>，脚本test.sh中内容为：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">echo</span> <span class="string">&quot;number of arguments: <span class="variable">$#</span>&quot;</span></span><br></pre></td></tr></table></figure>
+<p>执行<code>bash test.sh &lt; args</code>，得到的是<code>number of arguments: 0</code>，原因是使用输入重定向修改的不是命令行参数，而是标准输入。正确的方式是<code>bash test.sh $(cat log)</code>。</p>
+<h3 id="位置">位置</h3>
+<p>事实上实际上重定向可以放在命令的任何位置，因为在执行程序之前，bash会对命令进行解析，然后再传给程序，所以我们可以自己写个脚本看看是否是这样的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># test.sh</span></span><br><span class="line"><span class="built_in">echo</span> <span class="string">&quot;number of arguments: <span class="variable">$&#123;#&#125;</span>&quot;</span></span><br></pre></td></tr></table></figure>
+<p>然后使用<code>bash test.sh &gt; log 1 2 3 4 5</code>，得到的输出是5，说明只有后面的<code>1 2 3 4 5</code>被传入到脚本中了，也就是说bash会对几个重定位符号进行进行特殊处理，因此必须按照正确的语法来使用，否则会出现解析错误。如果不需要那么可以使用<code>\</code>进行转义，<code>bash test.sh \&gt; log 1 2 3 4 5</code>就行了。</p>
+<p>虽然可以放在任意位置，不过习惯上来说会放在最后面，除非没办法了，比如下面的多行模式中。</p>
+<h3 id="管道符">管道符</h3>
+<p>如果希望将一个命令的输出传给另外一个命令作为输入，可以使用管道符，<code>echo 1234 | grep 1234</code>就是这种，将<code>echo</code>的输出值作为<code>grep</code>的输入，可以想象<code>echo</code>的输出用一个管道链接到了<code>grep</code>的输入，管道符是一个非常实用的东西，将多个命令串联起来。</p>
+<p>使用管道符实际上会开启一个子进程（别人这么说的，我也不知道是不是）。和<code>&lt;&lt;&lt;</code>有一定相似之处，不过<code>&lt;&lt;&lt;</code>并不会开启子进程，而是通过临时文件来实现的，但是<code>&lt;&lt;&lt;</code>用的太少了，所以用管道符就行了，把<code>&lt;&lt;&lt;</code>暂时忽略掉吧。</p>
+<h2 id="多行模式">多行模式</h2>
+<p>有时候希望能够输入多行参数，比如想把一个多行的文本重定向输出到一个文件该怎么办？答案是使用<code>&lt;&lt;EOF</code>：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line"><span class="built_in">cat</span> &gt; main.c &lt;&lt;<span class="string">EOF</span></span><br><span class="line"><span class="string">#include&lt;stdio.h&gt;</span></span><br><span class="line"><span class="string">int main() &#123;</span></span><br><span class="line"><span class="string">	return 0;</span></span><br><span class="line"><span class="string">&#125;</span></span><br></pre></td></tr></table></figure>
+<p>在一行的末尾加上&lt;&lt;EOF之后会进入多行输入模式：</p>
+<p><img src="image-20230207181725471.png" /></p>
+<p>在结束输入之后再输入EOF就退出多行模式：</p>
+<p><img src="image-20230207181943081.png" /></p>
+<p>其实这里的EOF可以替换为任意的内容，不过，用EOF算是一个传统。</p>
+<p>实际上这里就是使用了输入重定向，在&lt;&lt;EOF后面输入的内容会被放入到一个临时文件中，然后作为程序的输入。</p>
+<h2 id="单行执行">单行执行</h2>
+<p>其实bash脚本可以单行执行多个命令，使得我们直接在终端里面就可以进行执行一大串命令，比如：<code>echo a; echo b; echo c</code>，要点就是使用分号进行分隔，即使是if、for这样的也可以在单行进行执行，比如：<code>for n in &#123;1..10&#125;; do echo &quot;$n&quot;; done; echo over</code>。在<strong>do</strong>后面不用一个分号，其他的都非常自然，有些时候会看到这样写的：</p>
+<figure class="highlight bash"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">for</span> n <span class="keyword">in</span> &#123;1..10&#125;; <span class="keyword">do</span> </span><br><span class="line">	<span class="built_in">echo</span> <span class="variable">$n</span></span><br><span class="line"><span class="keyword">done</span></span><br></pre></td></tr></table></figure>
+<p>但是我比较喜欢把do重新起一行。</p>
+<p>对于if也一样可以单行执行：<code>if [ 100 -eq 100 ]; then echo &quot;equal&quot;; fi</code>。</p>
+<p>另外注意一下分号的位置，不要不小心被识别为一个字符串的一部分了。</p>
+<h2 id="引用">引用</h2>
+<p>[1] <a target="_blank" rel="noopener" href="https://ryanstutorials.net/bash-scripting-tutorial">Ryans Tutorials —— Bash Scripting Tutorial</a></p>
+<p>[2] <a target="_blank" rel="noopener" href="https://opensource.com/article/18/5/you-dont-know-bash-intro-bash-arrays">You don't know Bash: An introduction to Bash arrays</a></p>
+<p>[3] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/24793069/what-does-do-in-bash">What does &amp;&gt; do in bash?</a></p>
+<p>[4] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/37876778/escape-dollar-sign-in-string-by-shell-script">Escape dollar sign in string by shell script</a></p>
+<p>[5] <a target="_blank" rel="noopener" href="https://stackoverflow.com/questions/6697753/difference-between-single-and-double-quotes-in-bash">Difference between single and double quotes in Bash</a></p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app">aana_h2</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/Bash/20230207Bash%E8%84%9A%E6%9C%AC%E5%9F%BA%E7%A1%80/main/">https://blog-aana-h2.vercel.app/articles/计算机/Bash/20230207Bash脚本基础/main/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog-aana-h2.vercel.app" target="_blank">A-Blog Project</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/shell/">shell</a></div><div class="post_share"></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/JDK/Projects/20230209Lilliput%E8%B0%83%E7%A0%94/main/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">Lilliput调研</div></div></a></div><div class="next-post pull-right"><a href="/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/%E7%BC%96%E8%AF%91/20230204%E6%A0%88%E5%BC%8F%E8%99%9A%E6%8B%9F%E6%9C%BA%E5%92%8C%E5%AF%84%E5%AD%98%E5%99%A8%E5%BC%8F%E8%99%9A%E6%8B%9F%E6%9C%BA/main/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">栈式虚拟机和寄存器式虚拟机</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"><div class="card-widget" id="card-toc"><div class="item-headline"><i class="fas fa-stream"></i><span>目录</span><span class="toc-percentage"></span></div><div class="toc-content is-expand"><ol class="toc"><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8F%98%E9%87%8F%E8%A1%A8%E8%BE%BE%E5%BC%8F%E5%92%8C%E4%BD%9C%E7%94%A8%E5%9F%9F"><span class="toc-number">1.</span> <span class="toc-text">变量、表达式和作用域</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%86%E6%94%AF"><span class="toc-number">2.</span> <span class="toc-text">分支</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BE%AA%E7%8E%AF"><span class="toc-number">3.</span> <span class="toc-text">循环</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%87%BD%E6%95%B0"><span class="toc-number">4.</span> <span class="toc-text">函数</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%88%97%E8%A1%A8"><span class="toc-number">5.</span> <span class="toc-text">列表</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%97%E7%AC%A6%E4%B8%B2%E5%A4%84%E7%90%86"><span class="toc-number">6.</span> <span class="toc-text">字符串处理</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E6%8B%BC%E6%8E%A5"><span class="toc-number">6.1.</span> <span class="toc-text">拼接</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E9%81%8D%E5%8E%86"><span class="toc-number">6.2.</span> <span class="toc-text">遍历</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E5%AD%90%E4%B8%B2"><span class="toc-number">6.3.</span> <span class="toc-text">子串</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E8%BD%AC%E4%B9%89%E5%A4%84%E7%90%86"><span class="toc-number">7.</span> <span class="toc-text">转义处理</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%AD%90%E8%BF%9B%E7%A8%8B"><span class="toc-number">8.</span> <span class="toc-text">子进程</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E7%89%B9%E6%AE%8A%E5%8F%98%E9%87%8F"><span class="toc-number">9.</span> <span class="toc-text">特殊变量</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#io%E9%87%8D%E5%AE%9A%E5%90%91"><span class="toc-number">10.</span> <span class="toc-text">IO重定向</span></a><ol class="toc-child"><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%93%E5%87%BA%E9%87%8D%E5%AE%9A%E5%90%91"><span class="toc-number">10.1.</span> <span class="toc-text">输出重定向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E8%BE%93%E5%85%A5%E9%87%8D%E5%AE%9A%E5%90%91"><span class="toc-number">10.2.</span> <span class="toc-text">输入重定向</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E4%BD%8D%E7%BD%AE"><span class="toc-number">10.3.</span> <span class="toc-text">位置</span></a></li><li class="toc-item toc-level-3"><a class="toc-link" href="#%E7%AE%A1%E9%81%93%E7%AC%A6"><span class="toc-number">10.4.</span> <span class="toc-text">管道符</span></a></li></ol></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%A4%9A%E8%A1%8C%E6%A8%A1%E5%BC%8F"><span class="toc-number">11.</span> <span class="toc-text">多行模式</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%8D%95%E8%A1%8C%E6%89%A7%E8%A1%8C"><span class="toc-number">12.</span> <span class="toc-text">单行执行</span></a></li><li class="toc-item toc-level-2"><a class="toc-link" href="#%E5%BC%95%E7%94%A8"><span class="toc-number">13.</span> <span class="toc-text">引用</span></a></li></ol></div></div></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By aana_h2</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button class="close" id="mobile-toc-button" type="button" title="目录"><i class="fas fa-list-ul"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>

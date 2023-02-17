@@ -1,0 +1,189 @@
+<!DOCTYPE html><html lang="zh-CN" data-theme="light"><head><meta charset="UTF-8"><meta http-equiv="X-UA-Compatible" content="IE=edge"><meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"><title>CMake实现链表 | A-Blog Project</title><meta name="author" content="aana_h2"><meta name="copyright" content="aana_h2"><meta name="format-detection" content="telephone=no"><meta name="theme-color" content="#ffffff"><meta name="description" content="在对CMake语言基础有了了解之后尝试一下使用CMake来实现链表吧，这里用到的都是之前提到过的基础语法内容。我们实现的链表功能非常的简单，能够只能够支持头部的插入、删除以及查找，不能够对中间进行操作，这看着更加类似于栈。 首先定义一下链表节点： 123# LINKED_LIST_&lt;ID&gt; 名字# USER_NEXT next字段# USER_VALUE value字段 然后是构造链表">
+<meta property="og:type" content="article">
+<meta property="og:title" content="CMake实现链表">
+<meta property="og:url" content="https://blog-aana-h2.vercel.app/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/CMAKE/CMake%E5%AE%9E%E7%8E%B0%E9%93%BE%E8%A1%A8/index.html">
+<meta property="og:site_name" content="A-Blog Project">
+<meta property="og:description" content="在对CMake语言基础有了了解之后尝试一下使用CMake来实现链表吧，这里用到的都是之前提到过的基础语法内容。我们实现的链表功能非常的简单，能够只能够支持头部的插入、删除以及查找，不能够对中间进行操作，这看着更加类似于栈。 首先定义一下链表节点： 123# LINKED_LIST_&lt;ID&gt; 名字# USER_NEXT next字段# USER_VALUE value字段 然后是构造链表">
+<meta property="og:locale" content="zh_CN">
+<meta property="article:published_time" content="2022-12-20T15:45:00.000Z">
+<meta property="article:modified_time" content="2023-02-02T10:20:32.000Z">
+<meta property="article:author" content="aana_h2">
+<meta property="article:tag" content="CMake">
+<meta name="twitter:card" content="summary"><link rel="shortcut icon" href="/img/favicon.png"><link rel="canonical" href="https://blog-aana-h2.vercel.app/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/CMAKE/CMake%E5%AE%9E%E7%8E%B0%E9%93%BE%E8%A1%A8/"><link rel="preconnect" href="//cdn.jsdelivr.net"/><link rel="stylesheet" href="/css/index.css"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free/css/all.min.css" media="print" onload="this.media='all'"><link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.min.css" media="print" onload="this.media='all'"><script>const GLOBAL_CONFIG = { 
+  root: '/',
+  algolia: undefined,
+  localSearch: undefined,
+  translate: undefined,
+  noticeOutdate: undefined,
+  highlight: {"plugin":"highlighjs","highlightCopy":true,"highlightLang":true,"highlightHeightLimit":false},
+  copy: {
+    success: '复制成功',
+    error: '复制错误',
+    noSupport: '浏览器不支持'
+  },
+  relativeDate: {
+    homepage: false,
+    post: false
+  },
+  runtime: '',
+  date_suffix: {
+    just: '刚刚',
+    min: '分钟前',
+    hour: '小时前',
+    day: '天前',
+    month: '个月前'
+  },
+  copyright: undefined,
+  lightbox: 'fancybox',
+  Snackbar: undefined,
+  source: {
+    justifiedGallery: {
+      js: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.js',
+      css: 'https://cdn.jsdelivr.net/npm/flickr-justified-gallery/dist/fjGallery.min.css'
+    }
+  },
+  isPhotoFigcaption: false,
+  islazyload: false,
+  isAnchor: false
+}</script><script id="config-diff">var GLOBAL_CONFIG_SITE = {
+  title: 'CMake实现链表',
+  isPost: true,
+  isHome: false,
+  isHighlightShrink: false,
+  isToc: false,
+  postUpdate: '2023-02-02 18:20:32'
+}</script><noscript><style type="text/css">
+  #nav {
+    opacity: 1
+  }
+  .justified-gallery img {
+    opacity: 1
+  }
+
+  #recent-posts time,
+  #post-meta time {
+    display: inline !important
+  }
+</style></noscript><script>(win=>{
+    win.saveToLocal = {
+      set: function setWithExpiry(key, value, ttl) {
+        if (ttl === 0) return
+        const now = new Date()
+        const expiryDay = ttl * 86400000
+        const item = {
+          value: value,
+          expiry: now.getTime() + expiryDay,
+        }
+        localStorage.setItem(key, JSON.stringify(item))
+      },
+
+      get: function getWithExpiry(key) {
+        const itemStr = localStorage.getItem(key)
+
+        if (!itemStr) {
+          return undefined
+        }
+        const item = JSON.parse(itemStr)
+        const now = new Date()
+
+        if (now.getTime() > item.expiry) {
+          localStorage.removeItem(key)
+          return undefined
+        }
+        return item.value
+      }
+    }
+  
+    win.getScript = url => new Promise((resolve, reject) => {
+      const script = document.createElement('script')
+      script.src = url
+      script.async = true
+      script.onerror = reject
+      script.onload = script.onreadystatechange = function() {
+        const loadState = this.readyState
+        if (loadState && loadState !== 'loaded' && loadState !== 'complete') return
+        script.onload = script.onreadystatechange = null
+        resolve()
+      }
+      document.head.appendChild(script)
+    })
+  
+      win.activateDarkMode = function () {
+        document.documentElement.setAttribute('data-theme', 'dark')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#0d0d0d')
+        }
+      }
+      win.activateLightMode = function () {
+        document.documentElement.setAttribute('data-theme', 'light')
+        if (document.querySelector('meta[name="theme-color"]') !== null) {
+          document.querySelector('meta[name="theme-color"]').setAttribute('content', '#ffffff')
+        }
+      }
+      const t = saveToLocal.get('theme')
+    
+          if (t === 'dark') activateDarkMode()
+          else if (t === 'light') activateLightMode()
+        
+      const asideStatus = saveToLocal.get('aside-status')
+      if (asideStatus !== undefined) {
+        if (asideStatus === 'hide') {
+          document.documentElement.classList.add('hide-aside')
+        } else {
+          document.documentElement.classList.remove('hide-aside')
+        }
+      }
+    
+    const detectApple = () => {
+      if(/iPad|iPhone|iPod|Macintosh/.test(navigator.userAgent)){
+        document.documentElement.classList.add('apple')
+      }
+    }
+    detectApple()
+    })(window)</script><link rel="stylesheet" href="/css/font.css"><link rel="stylesheet" href="/css/admonition.css"><meta name="generator" content="Hexo 6.3.0"></head><body><div id="sidebar"><div id="menu-mask"></div><div id="sidebar-menus"><div class="avatar-img is-center"><img src="https://i.loli.net/2021/02/24/5O1day2nriDzjSu.png" onerror="onerror=null;src='/img/friend_404.gif'" alt="avatar"/></div><div class="sidebar-site-data site-data is-center"><a href="/archives/"><div class="headline">文章</div><div class="length-num">34</div></a><a href="/tags/"><div class="headline">标签</div><div class="length-num">22</div></a><a href="/categories/"><div class="headline">分类</div><div class="length-num">1</div></a></div><hr/><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div></div></div><div class="post" id="body-wrap"><header class="not-top-img" id="page-header"><nav id="nav"><span id="blog_name"><a id="site-name" href="/">A-Blog Project</a></span><div id="menus"><div class="menus_items"><div class="menus_item"><a class="site-page" href="/"><i class="fa-fw fas fa-home"></i><span> Home</span></a></div><div class="menus_item"><a class="site-page" href="/archives/"><i class="fa-fw fas fa-timeline"></i><span> 时间线</span></a></div><div class="menus_item"><a class="site-page" href="/tags/"><i class="fa-fw fas fa-tags"></i><span> 标签</span></a></div><div class="menus_item"><a class="site-page" href="/series/"><i class="fa-fw fas fa-scroll"></i><span> 系列</span></a></div><div class="menus_item"><a class="site-page" href="/about/"><i class="fa-fw fas fa-user"></i><span> 关于作者</span></a></div><div class="menus_item"><a class="site-page" href="/todo/"><i class="fa-fw fas fa-list"></i><span> todo</span></a></div></div><div id="toggle-menu"><a class="site-page"><i class="fas fa-bars fa-fw"></i></a></div></div></nav></header><main class="layout" id="content-inner"><div id="post"><div id="post-info"><h1 class="post-title">CMake实现链表</h1><div id="post-meta"><div class="meta-firstline"><span class="post-meta-date"><i class="far fa-calendar-alt fa-fw post-meta-icon"></i><span class="post-meta-label">发表于</span><time class="post-meta-date-created" datetime="2022-12-20T15:45:00.000Z" title="发表于 2022-12-20 23:45:00">2022-12-20</time><span class="post-meta-separator">|</span><i class="fas fa-history fa-fw post-meta-icon"></i><span class="post-meta-label">更新于</span><time class="post-meta-date-updated" datetime="2023-02-02T10:20:32.000Z" title="更新于 2023-02-02 18:20:32">2023-02-02</time></span></div><div class="meta-secondline"></div></div></div><article class="post-content" id="article-container"><link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/hint.css/2.4.1/hint.min.css"><p>在对CMake语言基础有了了解之后尝试一下使用CMake来实现链表吧，这里用到的都是之前提到过的基础语法内容。我们实现的链表功能非常的简单，能够只能够支持头部的插入、删除以及查找，不能够对中间进行操作，这看着更加类似于栈。</p>
+<p>首先定义一下链表节点：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment"># LINKED_LIST_&lt;ID&gt; 名字</span></span><br><span class="line"><span class="comment"># USER_NEXT next字段</span></span><br><span class="line"><span class="comment"># USER_VALUE value字段</span></span><br></pre></td></tr></table></figure>
+<p>然后是构造链表的函数，这里需要一个全局变量来计数，使用directory的property来实现这一点，同时还有两个宏用于获取/设置VALUE和NEXT字段：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br><span class="line">34</span><br><span class="line">35</span><br><span class="line">36</span><br><span class="line">37</span><br><span class="line">38</span><br><span class="line">39</span><br><span class="line">40</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">set_directory_properties</span>(PROPERTIES USER_COUNTER <span class="number">0</span>)</span><br><span class="line"></span><br><span class="line"><span class="comment"># _var 输出的node名字</span></span><br><span class="line"><span class="comment"># Value value，可选的，如果没有则为0。</span></span><br><span class="line"><span class="keyword">function</span>(create_list_node _var)</span><br><span class="line">    <span class="keyword">cmake_parse_arguments</span>(LL <span class="string">&quot;&quot;</span> <span class="string">&quot;VALUE&quot;</span> <span class="string">&quot;&quot;</span> <span class="variable">$&#123;ARGN&#125;</span>)</span><br><span class="line">    <span class="keyword">if</span> (<span class="keyword">NOT</span> LL_VALUE)</span><br><span class="line">        <span class="keyword">set</span>(LL_VALUE <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line">    <span class="keyword">get_directory_property</span>(COUNTER_ID USER_COUNTER)</span><br><span class="line">    <span class="keyword">set</span>(NODE_NAME <span class="string">&quot;LINKED_LIST_$&#123;COUNTER_ID&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">math</span>(EXPR COUNTER_ID <span class="string">&quot;$&#123;COUNTER_ID&#125; + 1&quot;</span>)</span><br><span class="line">    <span class="keyword">set_directory_properties</span>(PROPERTIES USER_COUNTER <span class="variable">$&#123;COUNTER_ID&#125;</span>)</span><br><span class="line">    <span class="keyword">set</span>(<span class="variable">$&#123;_var&#125;</span> <span class="variable">$&#123;NODE_NAME&#125;</span> PARENT_SCOPE)</span><br><span class="line">    <span class="keyword">add_custom_target</span>(<span class="variable">$&#123;NODE_NAME&#125;</span>)</span><br><span class="line">    <span class="keyword">set_target_properties</span>(<span class="variable">$&#123;NODE_NAME&#125;</span> PROPERTIES</span><br><span class="line">                          USER_VALUE <span class="variable">$&#123;LL_VALUE&#125;</span>)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">macro</span>(get_next _head _next)</span><br><span class="line">    list_verify(<span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    <span class="keyword">get_target_property</span>(<span class="variable">$&#123;_next&#125;</span> <span class="variable">$&#123;_head&#125;</span> USER_NEXT)</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">macro</span>(set_next _head _next)</span><br><span class="line">    list_verify(<span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    <span class="keyword">set_target_properties</span>(<span class="variable">$&#123;_head&#125;</span> PROPERTIES</span><br><span class="line">                          USER_NEXT <span class="string">&quot;$&#123;_next&#125;&quot;</span>)</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">macro</span>(get_value _head _val)</span><br><span class="line">    list_verify(<span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    <span class="keyword">get_target_property</span>(<span class="variable">$&#123;_val&#125;</span> <span class="variable">$&#123;_head&#125;</span> USER_VALUE)</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">macro</span>(set_value _head _val)</span><br><span class="line">    list_verify(<span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    <span class="keyword">set_target_properties</span>(<span class="variable">$&#123;_head&#125;</span> PROPERTIES</span><br><span class="line">                          USER_VALUE <span class="string">&quot;$&#123;_val&#125;&quot;</span>)</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br></pre></td></tr></table></figure>
+<p>简单地来测试一下：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br></pre></td><td class="code"><pre><span class="line">create_list_node(acfun VALUE <span class="number">100</span>)</span><br><span class="line"><span class="keyword">message</span>(<span class="variable">$&#123;acfun&#125;</span>)</span><br><span class="line"><span class="keyword">get_target_property</span>(V <span class="variable">$&#123;acfun&#125;</span> USER_VALUE)</span><br><span class="line"><span class="keyword">message</span>(<span class="string">&quot;V=$&#123;V&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">create_list_node(acfun VALUE <span class="number">98</span>)</span><br><span class="line"><span class="keyword">message</span>(<span class="variable">$&#123;acfun&#125;</span>)</span><br><span class="line"><span class="keyword">get_target_property</span>(V <span class="variable">$&#123;acfun&#125;</span> USER_VALUE)</span><br><span class="line"><span class="keyword">message</span>(<span class="string">&quot;V=$&#123;V&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>如果没有问题的话，就继续前进吧。</p>
+<p>现在需要有一个头节点，用头节点的VALUE来标明这个链表的长度，下一步之前先来定义两个工具函数，分别用于获取链表长度和判断链表是否为空，除此之外还有一个宏用来判断链表是否合法。</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">macro</span>(list_verify _head)</span><br><span class="line">    <span class="keyword">get_target_property</span>(LEN <span class="variable">$&#123;_head&#125;</span> USER_VALUE)</span><br><span class="line">    <span class="keyword">if</span> (LEN <span class="keyword">STREQUAL</span> <span class="string">&quot;LEN-NOTFOUND&quot;</span>)</span><br><span class="line">        <span class="keyword">message</span>(FATAL_ERROR <span class="string">&quot;need a linked list.&quot;</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span>(list_length _head _var)</span><br><span class="line">    list_verify(<span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    get_value(<span class="variable">$&#123;_head&#125;</span> LEN)</span><br><span class="line">    <span class="keyword">set</span>(<span class="variable">$&#123;_var&#125;</span> <span class="variable">$&#123;LEN&#125;</span> PARENT_SCOPE)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span>(is_list_empty _head _var)</span><br><span class="line">    list_length(<span class="variable">$&#123;_head&#125;</span> _LEN)</span><br><span class="line">    <span class="keyword">if</span> (_LEN <span class="keyword">EQUAL</span> <span class="number">0</span>)</span><br><span class="line">        <span class="keyword">set</span>(<span class="variable">$&#123;_var&#125;</span> <span class="number">1</span> PARENT_SCOPE)</span><br><span class="line">    <span class="keyword">else</span>()</span><br><span class="line">        <span class="keyword">set</span>(<span class="variable">$&#123;_var&#125;</span> <span class="number">0</span> PARENT_SCOPE)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br></pre></td></tr></table></figure>
+<p>来验证一下是否正确：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">create_list_node(HEAD)</span><br><span class="line">is_list_empty(E <span class="variable">$&#123;HEAD&#125;</span>)</span><br><span class="line"><span class="keyword">message</span>(<span class="string">&quot;E=$&#123;E&#125;&quot;</span>)</span><br></pre></td></tr></table></figure>
+<p>如果没事的话就继续吧，这一步加入对链表头部进行插入/删除的函数：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br><span class="line">28</span><br><span class="line">29</span><br><span class="line">30</span><br><span class="line">31</span><br><span class="line">32</span><br><span class="line">33</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">macro</span>(assert_list_length _head _len)</span><br><span class="line">    list_length(<span class="variable">$&#123;_head&#125;</span> LEN)</span><br><span class="line">    <span class="keyword">if</span> (LEN <span class="keyword">LESS</span> _len)</span><br><span class="line">        <span class="keyword">message</span>(FATAL_ERROR <span class="string">&quot;expect length &gt;= $&#123;_len&#125;, but length = $&#123;LEN&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">endif</span>()</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">macro</span>(inc_length _head _len)</span><br><span class="line">    get_value(<span class="variable">$&#123;_head&#125;</span> _OLD_LEN)</span><br><span class="line">    <span class="keyword">math</span>(EXPR _NEW_LEN <span class="string">&quot;$&#123;_OLD_LEN&#125; + $&#123;_len&#125;&quot;</span>)</span><br><span class="line">    set_value(<span class="variable">$&#123;_head&#125;</span> <span class="variable">$&#123;_NEW_LEN&#125;</span>)</span><br><span class="line"><span class="keyword">endmacro</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span>(list_append_head _head _node)</span><br><span class="line">    get_next(<span class="variable">$&#123;_head&#125;</span> OLD_NEXT)</span><br><span class="line">    set_next(<span class="variable">$&#123;_node&#125;</span> <span class="variable">$&#123;OLD_NEXT&#125;</span>)</span><br><span class="line">    set_next(<span class="variable">$&#123;_head&#125;</span> <span class="variable">$&#123;_node&#125;</span>)</span><br><span class="line">    inc_length(<span class="variable">$&#123;_head&#125;</span> <span class="number">1</span>)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span>(list_pop_head _head)</span><br><span class="line">    assert_list_length(<span class="variable">$&#123;_head&#125;</span> <span class="number">1</span>)</span><br><span class="line">    list_head(<span class="variable">$&#123;_head&#125;</span> _OLD_NEXT)</span><br><span class="line">    get_next(<span class="variable">$&#123;_OLD_NEXT&#125;</span> _OLD_NEXT_NEXT)</span><br><span class="line">    set_next(<span class="variable">$&#123;_head&#125;</span> <span class="variable">$&#123;_OLD_NEXT_NEXT&#125;</span>)</span><br><span class="line">    inc_length(<span class="variable">$&#123;_head&#125;</span> -<span class="number">1</span>)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="keyword">function</span>(list_get_head _head _node)</span><br><span class="line">    assert_list_length(<span class="variable">$&#123;_head&#125;</span> <span class="number">1</span>)</span><br><span class="line">    get_next(<span class="variable">$&#123;_head&#125;</span> NEXT)</span><br><span class="line">    <span class="keyword">set</span>(<span class="variable">$&#123;_node&#125;</span> <span class="variable">$&#123;NEXT&#125;</span> PARENT_SCOPE)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br></pre></td></tr></table></figure>
+<p>上面先是定义了两个宏然后是定义了三个用于操作的函数，分别是插入、删除、获取。</p>
+<p>最后的两个函数用于在链表中进行查找和索引，下标从1开始：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br><span class="line">16</span><br><span class="line">17</span><br><span class="line">18</span><br><span class="line">19</span><br><span class="line">20</span><br><span class="line">21</span><br><span class="line">22</span><br><span class="line">23</span><br><span class="line">24</span><br><span class="line">25</span><br><span class="line">26</span><br><span class="line">27</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span>(list_at _head _idx _node)</span><br><span class="line">    assert_list_length(<span class="variable">$&#123;_head&#125;</span> _idx)</span><br><span class="line">    <span class="keyword">set</span>(IDX <span class="number">0</span>)</span><br><span class="line">    <span class="keyword">set</span>(CURRENT <span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    <span class="keyword">while</span>(<span class="keyword">NOT</span> <span class="variable">$&#123;IDX&#125;</span> <span class="keyword">EQUAL</span> <span class="variable">$&#123;_idx&#125;</span>)</span><br><span class="line">        get_next(<span class="variable">$&#123;CURRENT&#125;</span> CURRENT)</span><br><span class="line">        <span class="keyword">math</span>(EXPR IDX <span class="string">&quot;$&#123;IDX&#125; + 1&quot;</span>)</span><br><span class="line">    <span class="keyword">endwhile</span>()</span><br><span class="line">    <span class="keyword">set</span>(<span class="variable">$&#123;_node&#125;</span> <span class="variable">$&#123;CURRENT&#125;</span> PARENT_SCOPE)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br><span class="line"></span><br><span class="line"><span class="comment"># 找不到返回-1</span></span><br><span class="line"><span class="keyword">function</span>(list_index_of _head _value _idx)</span><br><span class="line">    get_next(<span class="variable">$&#123;_head&#125;</span> CURRENT)</span><br><span class="line">    <span class="keyword">set</span>(CURRENT_IDX <span class="number">1</span>)</span><br><span class="line">    <span class="keyword">while</span> (<span class="keyword">NOT</span> <span class="variable">$&#123;CURRENT&#125;</span> <span class="keyword">EQUAL</span> <span class="string">&quot;LL_NULL&quot;</span>)</span><br><span class="line">        get_value(<span class="variable">$&#123;CURRENT&#125;</span> VALUE)</span><br><span class="line">        <span class="keyword">if</span> (VALUE <span class="keyword">EQUAL</span> _value)</span><br><span class="line">            <span class="keyword">set</span>(<span class="variable">$&#123;_idx&#125;</span> <span class="variable">$&#123;CURRENT_IDX&#125;</span> PARENT_SCOPE)</span><br><span class="line">            <span class="keyword">return</span>()</span><br><span class="line">        <span class="keyword">endif</span>()</span><br><span class="line">        get_next(<span class="variable">$&#123;CURRENT&#125;</span> NEXT)</span><br><span class="line">        <span class="keyword">set</span>(CURRENT <span class="variable">$&#123;NEXT&#125;</span>)</span><br><span class="line">        <span class="keyword">math</span>(EXPR CURRENT_IDX <span class="string">&quot;$&#123;CURRENT_IDX&#125; + 1&quot;</span>)</span><br><span class="line">    <span class="keyword">endwhile</span> ()</span><br><span class="line">    <span class="keyword">set</span>(<span class="variable">$&#123;_idx&#125;</span> -<span class="number">1</span> PARENT_SCOPE)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br></pre></td></tr></table></figure>
+<p>最后用一个打印的函数来进行检查：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br></pre></td><td class="code"><pre><span class="line"><span class="keyword">function</span>(list_print _head)</span><br><span class="line">    list_verify(<span class="variable">$&#123;_head&#125;</span>)</span><br><span class="line">    get_next(<span class="variable">$&#123;_head&#125;</span> CURRENT)</span><br><span class="line">    <span class="keyword">set</span>(msg <span class="string">&quot;&quot;</span>)</span><br><span class="line">    <span class="keyword">while</span>(<span class="keyword">NOT</span> <span class="variable">$&#123;CURRENT&#125;</span> <span class="keyword">STREQUAL</span> <span class="string">&quot;LL_NULL&quot;</span>)</span><br><span class="line">        get_value(<span class="variable">$&#123;CURRENT&#125;</span> VALUE)</span><br><span class="line">        get_next(<span class="variable">$&#123;CURRENT&#125;</span> CURRENT)</span><br><span class="line">        <span class="keyword">set</span>(msg <span class="string">&quot;$&#123;msg&#125;, $&#123;VALUE&#125;&quot;</span>)</span><br><span class="line">    <span class="keyword">endwhile</span>()</span><br><span class="line">    <span class="keyword">message</span>(<span class="string">&quot;list: $&#123;msg&#125;&quot;</span>)</span><br><span class="line"><span class="keyword">endfunction</span>()</span><br></pre></td></tr></table></figure>
+<p>有一个简单的测试代码：</p>
+<figure class="highlight cmake"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br><span class="line">7</span><br><span class="line">8</span><br><span class="line">9</span><br><span class="line">10</span><br><span class="line">11</span><br><span class="line">12</span><br><span class="line">13</span><br><span class="line">14</span><br><span class="line">15</span><br></pre></td><td class="code"><pre><span class="line">create_list_node(HEAD)</span><br><span class="line"></span><br><span class="line"><span class="keyword">foreach</span> (IDX RANGE <span class="number">1</span> <span class="number">10</span>)</span><br><span class="line">    create_list_node(NODE VALUE <span class="variable">$&#123;IDX&#125;</span>)</span><br><span class="line">    list_append_head(<span class="variable">$&#123;HEAD&#125;</span> <span class="variable">$&#123;NODE&#125;</span>)</span><br><span class="line"><span class="keyword">endforeach</span> ()</span><br><span class="line"></span><br><span class="line">list_length(<span class="variable">$&#123;HEAD&#125;</span> LEN)</span><br><span class="line">list_index_of(<span class="variable">$&#123;HEAD&#125;</span> <span class="number">9</span> IDX)</span><br><span class="line"><span class="keyword">message</span>(<span class="variable">$&#123;IDX&#125;</span>)</span><br><span class="line">list_at(<span class="variable">$&#123;HEAD&#125;</span> <span class="variable">$&#123;IDX&#125;</span> NODE)</span><br><span class="line">get_value(<span class="variable">$&#123;NODE&#125;</span> VALUE)</span><br><span class="line"><span class="keyword">message</span>(<span class="string">&quot;value:$&#123;VALUE&#125;&quot;</span>)</span><br><span class="line"></span><br><span class="line">list_print(<span class="variable">$&#123;HEAD&#125;</span>)</span><br></pre></td></tr></table></figure>
+<p>这一段代码可以放在一个单独的文件里面，在需要的时候可以通过<code>include</code>命令引入，不过我感觉这段代码除了练习以外没什么价值了。</p>
+</article><div class="post-copyright"><div class="post-copyright__author"><span class="post-copyright-meta">文章作者: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app">aana_h2</a></span></div><div class="post-copyright__type"><span class="post-copyright-meta">文章链接: </span><span class="post-copyright-info"><a href="https://blog-aana-h2.vercel.app/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/CMAKE/CMake%E5%AE%9E%E7%8E%B0%E9%93%BE%E8%A1%A8/">https://blog-aana-h2.vercel.app/articles/计算机/CMAKE/CMake实现链表/</a></span></div><div class="post-copyright__notice"><span class="post-copyright-meta">版权声明: </span><span class="post-copyright-info">本博客所有文章除特别声明外，均采用 <a href="https://creativecommons.org/licenses/by-nc-sa/4.0/" target="_blank">CC BY-NC-SA 4.0</a> 许可协议。转载请注明来自 <a href="https://blog-aana-h2.vercel.app" target="_blank">A-Blog Project</a>！</span></div></div><div class="tag_share"><div class="post-meta__tag-list"><a class="post-meta__tags" href="/tags/CMake/">CMake</a></div><div class="post_share"></div></div><nav class="pagination-post" id="pagination"><div class="prev-post pull-left"><a href="/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/LLVM/20221226TableGen%E8%AF%AD%E6%B3%95/main/"><img class="prev-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of previous post"><div class="pagination-info"><div class="label">上一篇</div><div class="prev_info">TableGen语法</div></div></a></div><div class="next-post pull-right"><a href="/articles/%E8%AE%A1%E7%AE%97%E6%9C%BA/CMAKE/CMake%E7%BC%96%E8%AF%91%E9%85%8D%E7%BD%AE/"><img class="next-cover" src="data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7" onerror="onerror=null;src='/img/404.jpg'" alt="cover of next post"><div class="pagination-info"><div class="label">下一篇</div><div class="next_info">CMake编译配置</div></div></a></div></nav></div><div class="aside-content" id="aside-content"><div class="sticky_layout"></div></div></main><footer id="footer"><div id="footer-wrap"><div class="copyright">&copy;2022 - 2023 By aana_h2</div></div></footer></div><div id="rightside"><div id="rightside-config-hide"><button id="readmode" type="button" title="阅读模式"><i class="fas fa-book-open"></i></button><button id="darkmode" type="button" title="浅色和深色模式转换"><i class="fas fa-adjust"></i></button><button id="hide-aside-btn" type="button" title="单栏和双栏切换"><i class="fas fa-arrows-alt-h"></i></button></div><div id="rightside-config-show"><button id="rightside_config" type="button" title="设置"><i class="fas fa-cog fa-spin"></i></button><button id="go-up" type="button" title="回到顶部"><i class="fas fa-arrow-up"></i></button></div></div><div><script src="/js/utils.js"></script><script src="/js/main.js"></script><script src="https://cdn.jsdelivr.net/npm/@fancyapps/ui/dist/fancybox.umd.min.js"></script><div class="js-pjax"><script>(() => {
+  const $mermaidWrap = document.querySelectorAll('#article-container .mermaid-wrap')
+  if ($mermaidWrap.length) {
+    window.runMermaid = () => {
+      window.loadMermaid = true
+      const theme = document.documentElement.getAttribute('data-theme') === 'dark' ? 'dark' : 'default'
+
+      Array.from($mermaidWrap).forEach((item, index) => {
+        const mermaidSrc = item.firstElementChild
+        const mermaidThemeConfig = '%%{init:{ \'theme\':\'' + theme + '\'}}%%\n'
+        const mermaidID = 'mermaid-' + index
+        const mermaidDefinition = mermaidThemeConfig + mermaidSrc.textContent
+        mermaid.mermaidAPI.render(mermaidID, mermaidDefinition, (svgCode) => {
+          mermaidSrc.insertAdjacentHTML('afterend', svgCode)
+        })
+      })
+    }
+
+    const loadMermaid = () => {
+      window.loadMermaid ? runMermaid() : getScript('https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.min.js').then(runMermaid)
+    }
+
+    window.pjax ? loadMermaid() : document.addEventListener('DOMContentLoaded', loadMermaid)
+  }
+})()</script></div></div></body></html>
